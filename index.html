@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PNG Vehicle Landed Cost Calculator | Niugini Open Biz</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; padding: 20px; }
+        .calc-card { max-width: 480px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .calc-card h2 { color: #111; margin-top: 0; font-size: 22px; text-align: center; }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; font-weight: 600; margin-bottom: 6px; color: #333; font-size: 14px; }
+        select, input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 15px; box-sizing: border-box; }
+        .btn-calc { width: 100%; background: #0066cc; color: #fff; font-weight: bold; padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; margin-top: 10px; }
+        .btn-calc:hover { background: #004bb3; }
+        .result-box { margin-top: 22px; background: #eef6ff; border: 1px solid #b3d7ff; padding: 18px; border-radius: 8px; display: none; }
+        .result-title { font-size: 13px; text-transform: uppercase; color: #555; font-weight: bold; }
+        .result-price { font-size: 26px; font-weight: bold; color: #0066cc; margin: 5px 0 10px 0; }
+        .deposit-price { font-size: 16px; font-weight: 600; color: #28a745; }
+        .btn-whatsapp { display: block; text-align: center; background: #25D366; color: white; text-decoration: none; font-weight: bold; padding: 12px; border-radius: 8px; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="calc-card">
+    <h2>🇵🇬 PNG Landed Cost Calculator</h2>
+    <p style="text-align: center; font-size: 13px; color: #666; margin-bottom: 20px;">Estimate your total vehicle import price to any PNG port.</p>
+    
+    <div class="form-group">
+        <label>Select Vehicle Category:</label>
+        <select id="vehicleType">
+            <option value="0.20">Compact SUV / 4WD (e.g. X-Trail, RAV4, CR-V)</option>
+            <option value="0.45">Sedan / Hatchback (e.g. Corolla, Demio)</option>
+            <option value="0.25">Large SUV / Van (e.g. Harrier, Prado, HiAce)</option>
+            <option value="0.10">Commercial / Pickup Truck (e.g. Hilux, D-Max)</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Japan Price (USD $):</label>
+        <input type="number" id="usdPrice" placeholder="e.g. 4500" value="4500">
+    </div>
+
+    <div class="form-group">
+        <label>Destination Port in PNG:</label>
+        <select id="destinationPort">
+            <option value="2500">Port Moresby Port</option>
+            <option value="2500">Lae Port</option>
+            <option value="3200">Kokopo / Rabaul Port</option>
+            <option value="3500">Kavieng Port</option>
+            <option value="3200">Kimbe Port</option>
+            <option value="3800">Buka Port</option>
+            <option value="4200">Kiunga Port</option>
+        </select>
+    </div>
+
+    <button class="btn-calc" onclick="calculateCost()">Calculate Landed Cost</button>
+
+    <div id="resultBox" class="result-box">
+        <div class="result-title">Estimated Total Landed Package (PGK):</div>
+        <div class="result-price" id="totalLanded">K0.00</div>
+        <div class="deposit-price" id="depositRequired">60% Deposit: K0.00</div>
+        <p style="font-size: 11px; color: #666; margin-top: 8px;">*Includes CIF ocean freight, PNG Customs Duty, GST, and port clearance handling.</p>
+        
+        <a id="whatsappLink" href="#" target="_blank" class="btn-whatsapp">📱 Request Official Quote on WhatsApp</a>
+    </div>
+</div>
+
+<script>
+    function calculateCost() {
+        const exchangeRate = 4.10; // USD to PGK Exchange Rate + Buffer
+        const oceanFreightUSD = 1350; // Average Freight
+        
+        let usdPrice = parseFloat(document.getElementById('usdPrice').value) || 0;
+        let dutyRate = parseFloat(document.getElementById('vehicleType').value);
+        let portFee = parseFloat(document.getElementById('destinationPort').value);
+        
+        // Calculation Logic
+        let cifUSD = usdPrice + oceanFreightUSD;
+        let cifPGK = cifUSD * exchangeRate;
+        
+        let customsDuty = cifPGK * dutyRate;
+        let gst = (cifPGK + customsDuty) * 0.10;
+        
+        let totalLanded = cifPGK + customsDuty + gst + portFee;
+        let deposit = totalLanded * 0.60;
+        
+        // Output Results
+        document.getElementById('totalLanded').innerText = 'K ' + totalLanded.toLocaleString('en-US', {maximumFractionDigits: 0});
+        document.getElementById('depositRequired').innerText = '60% Pre-Order Deposit: K ' + deposit.toLocaleString('en-US', {maximumFractionDigits: 0});
+        
+        // Dynamic WhatsApp Link Setup
+        let waMessage = `Hi Niugini Open Biz, I used your calculator! I want a quote for a vehicle around $${usdPrice} USD shipped to my port. Estimated total: K${Math.round(totalLanded)}.`;
+        document.getElementById('whatsappLink').href = `https://wa.me/67578305513?text=${encodeURIComponent(waMessage)}`;
+        
+        document.getElementById('resultBox').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
