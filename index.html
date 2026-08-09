@@ -160,7 +160,7 @@
         }
 
         .price-value {
-            font-size: 30px;
+            font-size: 32px;
             font-weight: 800;
             color: var(--primary);
             margin: 4px 0;
@@ -224,16 +224,16 @@
     <!-- HEADER CARD -->
     <div class="card">
         <h1 class="header-title">🇵🇬 Niugini Open Biz</h1>
-        <p class="header-sub">Official Vehicle Import & Landed Cost Calculator</p>
+        <p class="header-sub">Vehicle Import Pre-Order & Driveaway Cost Calculator</p>
         <div id="rateStatus" class="rate-badge">🔄 Fetching Live USD-PGK Exchange Rate...</div>
 
         <!-- 3-STEP USER INSTRUCTION -->
         <div class="guide-box">
-            <strong>💡 How to Find Your Price in 3 Easy Steps:</strong>
+            <strong>💡 How to Calculate Your Driveaway Price (3 Easy Steps):</strong>
             <ol>
-                <li>Click any <strong>PNG Top Seller button</strong> below to view live stock on Be Forward.</li>
-                <li>Set Destination to <strong>Papua New Guinea</strong> + your Port to get the <strong>Total CIF Price (USD)</strong>.</li>
-                <li>Enter the <strong>CIF USD Price</strong> into the calculator below to see your <strong>All-Inclusive Landed PGK Price</strong>!</li>
+                <li>Click any <strong>PNG Top Seller model button</strong> below to search live stock on Be Forward.</li>
+                <li>On the vehicle page, select <strong>Papua New Guinea</strong> + <strong>Your Destination Port</strong> to get the total <strong>CIF Price (USD)</strong>.</li>
+                <li>Enter the <strong>CIF USD Price</strong> into the calculator below to get your complete <strong>Landed Driveaway PGK Price</strong>!</li>
             </ol>
         </div>
 
@@ -253,7 +253,7 @@
 
     <!-- CALCULATOR CARD -->
     <div class="card">
-        <h2>🧮 Landed Cost Calculator</h2>
+        <h2>🧮 Driveaway Landed Cost Calculator</h2>
         
         <div class="form-group">
             <label>Vehicle Category (PNG Customs Duty Rate):</label>
@@ -283,27 +283,19 @@
             </select>
         </div>
 
-        <div class="form-group">
-            <label>Clearance & Delivery Package:</label>
-            <select id="serviceTier">
-                <option value="standard">Standard Direct Pre-Order (Full Service Import & Port Clearance)</option>
-                <option value="express">Priority Express Pre-Order (Includes Fast-Track Customs & Inspection)</option>
-            </select>
-        </div>
-
-        <button class="btn-calc" onclick="calculateCost()">Calculate All-Inclusive Total Quote</button>
+        <button class="btn-calc" onclick="calculateCost()">Calculate Total Driveaway Cost</button>
 
         <!-- OUTPUT BOX -->
         <div id="resultBox" class="result-box">
-            <div class="price-title">All-Inclusive Total Landed Quote:</div>
+            <div class="price-title">Total Driveaway Price (PGK):</div>
             <div class="price-value" id="totalPrice">K0.00</div>
             <div class="deposit-value" id="depositPrice">60% Required Pre-Order Deposit: K0.00</div>
             
             <p class="disclaimer">
-                *Package Price Includes: Full CIF Price (Vehicle + Shipping + Insurance), PNG Customs Duty, GST, Port Wharfage, & Complete Local Agency Clearance Handling.
+                *Package Price Includes: Full CIF Price (Vehicle + Ocean Freight + Insurance), PNG Customs Duty, GST, Port Wharfage & Local Agency Port Clearance Handling.
             </p>
 
-            <a id="waButton" href="#" target="_blank" class="btn-wa">💬 Lock In This Order via WhatsApp</a>
+            <a id="waButton" href="#" target="_blank" class="btn-wa">💬 Reserve Vehicle via WhatsApp</a>
         </div>
     </div>
 
@@ -331,13 +323,13 @@
 
     // Calculation Engine
     function calculateCost() {
-        const agentFeePGK = 1500; // Fixed Agent Clearance Fee
+        const agentFeePGK = 1500;   // Agency Clearance Fee
+        const markupPGK = 10000;    // Standard Flat Profit Markup (Hidden from UI)
 
         let cifUSD = parseFloat(document.getElementById('usdCif').value) || 0;
         let dutyRate = parseFloat(document.getElementById('dutyRate').value);
         let wharfagePGK = parseFloat(document.getElementById('portWharfage').value);
         let portName = document.getElementById('portWharfage').options[document.getElementById('portWharfage').selectedIndex].text;
-        let serviceTier = document.getElementById('serviceTier').value;
 
         // 1. CIF Conversion to PGK
         let cifPGK = cifUSD * liveUsdToPgk;
@@ -346,25 +338,17 @@
         let dutyPGK = cifPGK * dutyRate;
         let gstPGK = (cifPGK + dutyPGK) * 0.10;
 
-        // 3. Base Landed Cost
-        let baseLandedCost = cifPGK + dutyPGK + gstPGK + wharfagePGK + agentFeePGK;
+        // 3. Driveaway Price (CIF + Duty + GST + Wharfage + Clearance Agent Fee + K10,000 Markup)
+        let totalDriveawayPrice = cifPGK + dutyPGK + gstPGK + wharfagePGK + agentFeePGK + markupPGK;
 
-        // 4. Hidden Internal Profit Margins (Customer only sees Tier Names)
-        let finalPrice = 0;
-        if (serviceTier === 'express') {
-            finalPrice = baseLandedCost * 1.3333; // 33.33% Margin internally
-        } else {
-            finalPrice = baseLandedCost + 10000;   // Flat K10,000 Margin internally
-        }
-
-        let deposit60 = finalPrice * 0.60;
+        let deposit60 = totalDriveawayPrice * 0.60;
 
         // Display Results
-        document.getElementById('totalPrice').innerText = 'K ' + Math.round(finalPrice).toLocaleString();
+        document.getElementById('totalPrice').innerText = 'K ' + Math.round(totalDriveawayPrice).toLocaleString();
         document.getElementById('depositPrice').innerText = '60% Pre-Order Deposit: K ' + Math.round(deposit60).toLocaleString();
 
-        // WhatsApp Message Payload
-        let waMessage = `Hi Niugini Open Biz! I calculated a quote on your site.\n\n- CIF Price: $${cifUSD} USD\n- Port: ${portName}\n- Estimated Landed Total: K${Math.round(finalPrice).toLocaleString()}\n- Required 60% Deposit: K${Math.round(deposit60).toLocaleString()}\n\nPlease help me reserve and process this order!`;
+        // WhatsApp Payload
+        let waMessage = `Hi Niugini Open Biz! I calculated a driveaway quote on your site.\n\n- CIF Price: $${cifUSD} USD\n- Destination Port: ${portName}\n- Total Driveaway Quote: K${Math.round(totalDriveawayPrice).toLocaleString()}\n- Required 60% Deposit: K${Math.round(deposit60).toLocaleString()}\n\nPlease help me verify and process this order!`;
         
         document.getElementById('waButton').href = `https://wa.me/67578305513?text=${encodeURIComponent(waMessage)}`;
 
