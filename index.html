@@ -3,96 +3,373 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PNG Vehicle Landed Cost Calculator | Niugini Open Biz</title>
+    <title>Niugini Open Biz | PNG Vehicle Landed Cost Calculator & Live Japan Stock</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; padding: 20px; }
-        .calc-card { max-width: 480px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .calc-card h2 { color: #111; margin-top: 0; font-size: 22px; text-align: center; }
-        .form-group { margin-bottom: 18px; }
-        label { display: block; font-weight: 600; margin-bottom: 6px; color: #333; font-size: 14px; }
-        select, input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 15px; box-sizing: border-box; }
-        .btn-calc { width: 100%; background: #0066cc; color: #fff; font-weight: bold; padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; margin-top: 10px; }
-        .btn-calc:hover { background: #004bb3; }
-        .result-box { margin-top: 22px; background: #eef6ff; border: 1px solid #b3d7ff; padding: 18px; border-radius: 8px; display: none; }
-        .result-title { font-size: 13px; text-transform: uppercase; color: #555; font-weight: bold; }
-        .result-price { font-size: 26px; font-weight: bold; color: #0066cc; margin: 5px 0 10px 0; }
-        .deposit-price { font-size: 16px; font-weight: 600; color: #28a745; }
-        .btn-whatsapp { display: block; text-align: center; background: #25D366; color: white; text-decoration: none; font-weight: bold; padding: 12px; border-radius: 8px; margin-top: 15px; }
+        :root {
+            --primary: #0056b3;
+            --primary-hover: #003d80;
+            --success: #28a745;
+            --dark: #222222;
+            --light-bg: #f4f6f9;
+            --card-bg: #ffffff;
+            --border: #e1e4e8;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            background-color: var(--light-bg);
+            color: #333333;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+
+        h1, h2, h3 {
+            color: var(--dark);
+            margin-top: 0;
+        }
+
+        .header-title {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 6px;
+        }
+
+        .header-sub {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        /* Rate Status Badge */
+        .rate-badge {
+            font-size: 13px;
+            color: #155724;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        /* Model Grid */
+        .model-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .btn-model {
+            display: block;
+            text-align: center;
+            background: #f8f9fa;
+            border: 1px solid var(--border);
+            padding: 10px 8px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #333;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-model:hover {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+        }
+
+        /* Form Inputs */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 15px;
+            box-sizing: border-box;
+            background: #fff;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn-calc {
+            width: 100%;
+            background: var(--primary);
+            color: #ffffff;
+            font-weight: bold;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.2s ease;
+        }
+
+        .btn-calc:hover {
+            background: var(--primary-hover);
+        }
+
+        /* Results Box */
+        .result-box {
+            margin-top: 20px;
+            background: #f0f7ff;
+            border: 1px solid #b8daff;
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .price-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #555;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .price-value {
+            font-size: 30px;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 4px 0;
+        }
+
+        .deposit-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--success);
+            margin-bottom: 12px;
+        }
+
+        .disclaimer {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 15px;
+            border-top: 1px solid #d0e3ff;
+            padding-top: 8px;
+        }
+
+        .btn-wa {
+            display: block;
+            text-align: center;
+            background: var(--success);
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 13px;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        .btn-wa:hover {
+            background: #218838;
+        }
+
+        /* Step Guide Accordion */
+        .guide-box {
+            background: #fffbe6;
+            border: 1px solid #ffe58f;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .guide-box ol {
+            margin: 8px 0 0 0;
+            padding-left: 20px;
+        }
+
+        .guide-box li {
+            margin-bottom: 6px;
+        }
     </style>
 </head>
 <body>
 
-<div class="calc-card">
-    <h2>🇵🇬 PNG Landed Cost Calculator</h2>
-    <p style="text-align: center; font-size: 13px; color: #666; margin-bottom: 20px;">Estimate your total vehicle import price to any PNG port.</p>
-    
-    <div class="form-group">
-        <label>Select Vehicle Category:</label>
-        <select id="vehicleType">
-            <option value="0.20">Compact SUV / 4WD (e.g. X-Trail, RAV4, CR-V)</option>
-            <option value="0.45">Sedan / Hatchback (e.g. Corolla, Demio)</option>
-            <option value="0.25">Large SUV / Van (e.g. Harrier, Prado, HiAce)</option>
-            <option value="0.10">Commercial / Pickup Truck (e.g. Hilux, D-Max)</option>
-        </select>
+<div class="container">
+
+    <!-- HEADER CARD -->
+    <div class="card">
+        <h1 class="header-title">🇵🇬 Niugini Open Biz</h1>
+        <p class="header-sub">Official Vehicle Import & Landed Cost Calculator</p>
+        <div id="rateStatus" class="rate-badge">🔄 Fetching Live USD-PGK Exchange Rate...</div>
+
+        <!-- 3-STEP USER INSTRUCTION -->
+        <div class="guide-box">
+            <strong>💡 How to Find Your Price in 3 Easy Steps:</strong>
+            <ol>
+                <li>Click any <strong>PNG Top Seller button</strong> below to view live stock on Be Forward.</li>
+                <li>Ensure Destination is set to <strong>Papua New Guinea</strong> and copy the <strong>FOB USD Price</strong>.</li>
+                <li>Paste the FOB price into the calculator below to get your <strong>All-Inclusive Landed PGK Price</strong>!</li>
+            </ol>
+        </div>
+
+        <!-- PNG TOP SELLERS DIRECTORY (BFS ID 875341 PRE-EMBEDDED) -->
+        <h3>🚗 PNG's Top Imported Models (Browse Live Stock):</h3>
+        <div class="model-grid">
+            <a href="https://www.beforward.jp/stocklist/make=1/model=212/sortkey=a?refer_bfs=875341" target="_blank" class="btn-model">Toyota Mark X</a>
+            <a href="https://www.beforward.jp/stocklist/make=3/model=473/sortkey=a?refer_bfs=875341" target="_blank" class="btn-model">Nissan X-Trail</a>
+            <a href="https://www.beforward.jp/stocklist/make=1/model=207/sortkey=a?refer_bfs=875341" target="_blank" class="btn-model">Toyota Mark II</a>
+            <a href="https://www.beforward.jp/stocklist/make=4/model=13365/sortkey=a?refer_bfs=875341" target="_blank" class="btn-model">Mazda CX-5</a>
+            <a href="https://www.beforward.jp/stocklist/make=1/model=181/sortkey=a?refer_bfs=875341" target="_blank" class="btn-model">Toyota Harrier</a>
+            <a href="https://www.beforward.jp/stocklist/make=4/model=475/sortkey=a?refer_bfs=875341" target="_blank" class="btn-model">Mazda Atenza</a>
+            <a href="https://www.beforward.jp/stocklist/make=1/model=151/sortkey=a?refer_bfs=875341" target="_blank" class="btn-model">Toyota Crown</a>
+            <a href="https://www.beforward.jp/stocklist/make=3/model=364/sortkey=a?refer_bfs=875341" target="_blank" class="btn-model">Nissan Sylphy</a>
+        </div>
     </div>
 
-    <div class="form-group">
-        <label>Japan Price (USD $):</label>
-        <input type="number" id="usdPrice" placeholder="e.g. 4500" value="4500">
-    </div>
-
-    <div class="form-group">
-        <label>Destination Port in PNG:</label>
-        <select id="destinationPort">
-            <option value="2500">Port Moresby Port</option>
-            <option value="2500">Lae Port</option>
-            <option value="3200">Kokopo / Rabaul Port</option>
-            <option value="3500">Kavieng Port</option>
-            <option value="3200">Kimbe Port</option>
-            <option value="3800">Buka Port</option>
-            <option value="4200">Kiunga Port</option>
-        </select>
-    </div>
-
-    <button class="btn-calc" onclick="calculateCost()">Calculate Landed Cost</button>
-
-    <div id="resultBox" class="result-box">
-        <div class="result-title">Estimated Total Landed Package (PGK):</div>
-        <div class="result-price" id="totalLanded">K0.00</div>
-        <div class="deposit-price" id="depositRequired">60% Deposit: K0.00</div>
-        <p style="font-size: 11px; color: #666; margin-top: 8px;">*Includes CIF ocean freight, PNG Customs Duty, GST, and port clearance handling.</p>
+    <!-- CALCULATOR CARD -->
+    <div class="card">
+        <h2>🧮 Landed Cost Calculator</h2>
         
-        <a id="whatsappLink" href="#" target="_blank" class="btn-whatsapp">📱 Request Official Quote on WhatsApp</a>
+        <div class="form-group">
+            <label>Vehicle Category (PNG Customs Duty Rate):</label>
+            <select id="dutyRate">
+                <option value="0.20">Compact SUV / 4WD (e.g., X-Trail, RAV4, CR-V - 20% Duty)</option>
+                <option value="0.45">Sedan / Hatchback (e.g., Mark X, Axio, Demio - 45% Duty)</option>
+                <option value="0.25">Large SUV / Passenger Van (e.g., Harrier, Prado, HiAce - 25% Duty)</option>
+                <option value="0.10">Commercial / Pickup Truck (e.g., Hilux, D-Max - 10% Duty)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Japan FOB Price (USD $):</label>
+            <input type="number" id="usdFob" placeholder="e.g. 4200" value="4200">
+        </div>
+
+        <div class="form-group">
+            <label>Destination Port in PNG:</label>
+            <select id="portWharfage">
+                <option value="1950">Port Moresby Port (Wharfage & Handling: K1,950)</option>
+                <option value="1950">Lae Port (Wharfage & Handling: K1,950)</option>
+                <option value="2500">Kavieng Port (Wharfage & Handling: K2,500)</option>
+                <option value="2500">Rabaul / Kokopo Port (Wharfage & Handling: K2,500)</option>
+                <option value="2500">Kimbe Port (Wharfage & Handling: K2,500)</option>
+                <option value="2500">Buka Port (Wharfage & Handling: K2,500)</option>
+                <option value="2500">Kiunga Port (Wharfage & Handling: K2,500)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Pricing Strategy Model:</label>
+            <select id="markupStrategy">
+                <option value="flat">Flat Profit Markup (+ K10,000)</option>
+                <option value="percent">Standard Margin (+33.33% of Base Landed)</option>
+            </select>
+        </div>
+
+        <button class="btn-calc" onclick="calculateCost()">Calculate All-Inclusive Total Quote</button>
+
+        <!-- OUTPUT BOX -->
+        <div id="resultBox" class="result-box">
+            <div class="price-title">All-Inclusive Total Landed Quote:</div>
+            <div class="price-value" id="totalPrice">K0.00</div>
+            <div class="deposit-value" id="depositPrice">60% Required Pre-Order Deposit: K0.00</div>
+            
+            <p class="disclaimer">
+                *Package Price Includes: Vehicle Purchase in Japan, Ocean Freight, PNG Customs Duty, GST, Port Wharfage & Local Agent Clearance Handling.
+            </p>
+
+            <a id="waButton" href="#" target="_blank" class="btn-wa">💬 Lock In This Order via WhatsApp</a>
+        </div>
     </div>
+
 </div>
 
 <script>
+    // Configuration
+    let liveUsdToPgk = 4.10; // Fallback default rate
+    const txFeeBuffer = 1.03; // 3% TT / Forex Transaction Fee Buffer
+
+    // Fetch Live Exchange Rate on Page Load
+    async function fetchFxRate() {
+        try {
+            let response = await fetch('https://open.er-api.com/v6/latest/USD');
+            let data = await response.json();
+            if(data && data.rates && data.rates.PGK) {
+                liveUsdToPgk = data.rates.PGK * txFeeBuffer;
+                document.getElementById('rateStatus').innerText = `✅ Live Rate: $1 USD = K${liveUsdToPgk.toFixed(2)} PGK (Incl. TT Transfer Fees)`;
+            }
+        } catch (e) {
+            document.getElementById('rateStatus').innerText = `⚠️ Standard Rate Applied: $1 USD = K${(liveUsdToPgk * txFeeBuffer).toFixed(2)} PGK`;
+        }
+    }
+    fetchFxRate();
+
+    // Calculation Engine
     function calculateCost() {
-        const exchangeRate = 4.10; // USD to PGK Exchange Rate + Buffer
-        const oceanFreightUSD = 1350; // Average Freight
+        const oceanFreightUSD = 1350; // Ocean Freight Estimate
+        const agentFeePGK = 1500;     // Fixed Agent Fee
+
+        let fobUSD = parseFloat(document.getElementById('usdFob').value) || 0;
+        let dutyRate = parseFloat(document.getElementById('dutyRate').value);
+        let wharfagePGK = parseFloat(document.getElementById('portWharfage').value);
+        let portName = document.getElementById('portWharfage').options[document.getElementById('portWharfage').selectedIndex].text.split(' (')[0];
+        let markupStrategy = document.getElementById('markupStrategy').value;
+
+        // 1. CIF Calculation in PGK
+        let cifUSD = fobUSD + oceanFreightUSD;
+        let cifPGK = cifUSD * liveUsdToPgk;
+
+        // 2. Customs Duty & GST
+        let dutyPGK = cifPGK * dutyRate;
+        let gstPGK = (cifPGK + dutyPGK) * 0.10;
+
+        // 3. Base Landed Cost (Hard Cost)
+        let baseLandedCost = cifPGK + dutyPGK + gstPGK + wharfagePGK + agentFeePGK;
+
+        // 4. Final Selling Price
+        let finalPrice = 0;
+        if (markupStrategy === 'percent') {
+            finalPrice = baseLandedCost * 1.3333; // 33.33% Markup
+        } else {
+            finalPrice = baseLandedCost + 10000;   // Flat K10,000 Markup
+        }
+
+        let deposit60 = finalPrice * 0.60;
+
+        // Display Results
+        document.getElementById('totalPrice').innerText = 'K ' + Math.round(finalPrice).toLocaleString();
+        document.getElementById('depositPrice').innerText = '60% Pre-Order Deposit: K ' + Math.round(deposit60).toLocaleString();
+
+        // Generate WhatsApp Message Link (Attached with BFS ID refer_bfs=875341)
+        let waMessage = `Hi Niugini Open Biz! I calculated a quote on your site.\n\n- Vehicle FOB: $${fobUSD} USD\n- Destination Port: ${portName}\n- Estimated Landed Total: K${Math.round(finalPrice).toLocaleString()}\n- Required Deposit: K${Math.round(deposit60).toLocaleString()}\n\nPlease help me find and lock in active stock options!`;
         
-        let usdPrice = parseFloat(document.getElementById('usdPrice').value) || 0;
-        let dutyRate = parseFloat(document.getElementById('vehicleType').value);
-        let portFee = parseFloat(document.getElementById('destinationPort').value);
-        
-        // Calculation Logic
-        let cifUSD = usdPrice + oceanFreightUSD;
-        let cifPGK = cifUSD * exchangeRate;
-        
-        let customsDuty = cifPGK * dutyRate;
-        let gst = (cifPGK + customsDuty) * 0.10;
-        
-        let totalLanded = cifPGK + customsDuty + gst + portFee;
-        let deposit = totalLanded * 0.60;
-        
-        // Output Results
-        document.getElementById('totalLanded').innerText = 'K ' + totalLanded.toLocaleString('en-US', {maximumFractionDigits: 0});
-        document.getElementById('depositRequired').innerText = '60% Pre-Order Deposit: K ' + deposit.toLocaleString('en-US', {maximumFractionDigits: 0});
-        
-        // Dynamic WhatsApp Link Setup
-        let waMessage = `Hi Niugini Open Biz, I used your calculator! I want a quote for a vehicle around $${usdPrice} USD shipped to my port. Estimated total: K${Math.round(totalLanded)}.`;
-        document.getElementById('whatsappLink').href = `https://wa.me/67578305513?text=${encodeURIComponent(waMessage)}`;
-        
+        document.getElementById('waButton').href = `https://wa.me/67578305513?text=${encodeURIComponent(waMessage)}`;
+
         document.getElementById('resultBox').style.display = 'block';
     }
 </script>
