@@ -52,6 +52,32 @@
             margin-bottom: 20px; text-align: center; font-weight: 600;
         }
 
+        /* INSTRUCTION NOTE BOX */
+        .instruction-box {
+            background-color: #fff8e1;
+            border-left: 5px solid #ffc107;
+            padding: 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #444;
+        }
+        .instruction-box h4 {
+            margin: 0 0 10px 0;
+            color: #b78103;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .instruction-box ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .instruction-box li {
+            margin-bottom: 6px;
+        }
+
         .model-grid {
             display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
             gap: 10px; margin-top: 12px;
@@ -106,13 +132,12 @@
         }
         .close-modal { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; }
 
-        /* PDF DOCUMENT SPECIFIC STYLES (MATCHES YOUR ATTACHED QUOTE PDF) */
+        /* PDF DOCUMENT SPECIFIC STYLES */
         #pdfTemplate {
             padding: 20px; background: #ffffff; color: #000; font-size: 12px; font-family: Arial, sans-serif;
         }
         .q-header { display: flex; justify-content: space-between; border-bottom: 2px solid #222; padding-bottom: 10px; }
-        .q-brand { font-size: 22px; font-weight: bold; color: #0056b3; }
-        .q-subbrand { font-size: 16px; font-weight: bold; }
+        .q-logo { max-width: 180px; height: auto; margin-bottom: 8px; }
         .q-billing-grid { display: flex; justify-content: space-between; margin: 15px 0; }
         .q-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         .q-table th, .q-table td { border: 1px solid #ccc; padding: 8px; text-align: left; }
@@ -149,6 +174,17 @@
 
     <!-- CALCULATOR CARD -->
     <div class="card">
+        
+        <!-- INSTRUCTION NOTE -->
+        <div class="instruction-box">
+            <h4>💡 How to Calculate Your Driveaway Price (3 Easy Steps):</h4>
+            <ol>
+                <li>Click any PNG Top Seller model button below to search live stock on Be Forward.</li>
+                <li>On the vehicle page, select <strong>Papua New Guinea + Your Destination Port</strong> to get the total CIF Price (USD).</li>
+                <li>Enter the CIF USD Price into the calculator below to get your complete Landed Driveaway PGK Price!</li>
+            </ol>
+        </div>
+
         <h2>🧮 Driveaway Landed Cost Calculator</h2>
         
         <div class="form-group">
@@ -206,107 +242,110 @@
             <input type="text" id="vehModelInput" placeholder="Vehicle Name (e.g. NISSAN X-TRAIL T31 SUV)">
             <input type="text" id="stockRefInput" placeholder="Be Forward Stock Code (e.g. CE139082)">
         </div>
-        <button class="btn-calc" style="margin-bottom: 20px;" onclick="renderPDFPreview()">Update Quote Preview</button>
 
-        <!-- PRINTABLE FORMAL QUOTE TEMPLATE (PDF target) -->
-        <div id="pdfTemplate">
-            <div class="q-header">
-                <div>
-                    <div class="q-brand">NIUAGINI</div>
-                    <div class="q-subbrand">open biz</div>
-                    <div>Section 42, Lot 95, Galo Place, Angau Drive</div>
-                    <div>Boroko, Port Moresby NCD</div>
-                    <div>Mobile No. 7830 5513 / 77757633 / 7333 8200</div>
-                    <div>sales@niuginibiz.com</div>
-                </div>
-                <div style="text-align: right;">
-                    <h2 style="margin: 0; color: #0056b3;">Quote</h2>
-                    <div><strong>DATE:</strong> <span id="qDate">10-Aug-2026</span></div>
-                    <div><strong>Proforma Inv #:</strong> <span id="qInvNo">NBZ2630</span></div>
-                    <div><strong>Customer ID:</strong> Cash Sales</div>
-                    <div style="margin-top: 10px;"><strong>Quotation valid until:</strong></div>
-                    <div id="qValidDate">September 10, 2026</div>
-                    <div><strong>Prepared by:</strong> Sales</div>
-                </div>
-            </div>
+        <button class="btn-calc" style="margin-bottom: 20px;" onclick="showQuotePreview()">Preview Quotation</button>
 
-            <div class="q-billing-grid">
-                <div>
-                    <strong>Bill To:</strong><br>
-                    <span id="qCustName">Kilala Rabbie Benson</span><br>
-                    <span id="qCustLocation">KAVIENG, NIP</span><br>
-                    <span id="qCustPhone">Ph. +67570630933</span><br>
-                    <span id="qCustEmail">Email: kilalarabbieb@gmail.com</span>
-                </div>
-            </div>
-
-            <table class="q-table">
-                <thead>
-                    <tr>
-                        <th>Description</th>
-                        <th style="width: 40px;">Qty</th>
-                        <th style="width: 100px; text-align: right;">Unit Price</th>
-                        <th style="width: 110px; text-align: right;">Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            <strong id="qVehName">NISSAN X-TRAIL T31 SUV (Japanese Used Vehicle)</strong><br>
-                            All-Inclusive Pre-Order & Landed Package<br><br>
-                            <strong>VEHICLE SPECIFICATIONS:</strong><br>
-                            Code / Stock Ref: <span id="qCode">CE139082</span><br><br>
-                            <strong>PACKAGE INCLUDES:</strong><br>
-                            • Vehicle Purchase & Pre-Shipment Inspection in Japan<br>
-                            • International RORO Ocean Freight to <span id="qPort">Port</span><br>
-                            • All PNG Customs Duties, Import Taxes (GST), & Port Handling Charges<br>
-                            • End-to-End Customs Clearance & Handover at <span id="qPort2">Port</span><br><br>
-                            <strong>PAYMENT TERMS (2-STAGE STRUCTURE):</strong><br>
-                            • <strong>60% Initial Deposit Required Upon Order Confirmation:</strong> <span id="qDeposit">K0.00</span><br>
-                            • <strong>40% Final Balance Due 1 Week Prior to Vessel Arrival:</strong> <span id="qBalance">K0.00</span><br><br>
-                            <strong>ESTIMATED DELIVERY TIMELINE:</strong><br>
-                            • ~8 Weeks from deposit confirmation to port arrival.
-                        </td>
-                        <td>1</td>
-                        <td style="text-align: right;" id="qUnitPrice">K 0.00</td>
-                        <td style="text-align: right; font-weight: bold;" id="qLineAmount">K 0.00</td>
-                    </tr>
-                    <tr class="q-total-row">
-                        <td colspan="3" style="text-align: right;">TOTAL</td>
-                        <td style="text-align: right; color: #0056b3;" id="qTotal">K 0.00</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div style="font-size: 10px; margin-top: 10px; color: #444;">
-                <strong>IMPORTANT NOTICE ON VEHICLE AVAILABILITY & PRICING:</strong><br>
-                1. <strong>Stock Availability:</strong> This quotation is based on active Japanese auction/supplier listing. Live inventory updates continuously and is subject to prior sale.<br>
-                2. <strong>Price & Spec Guarantee:</strong> The quoted price applies specifically to this exact vehicle. If this unit is sold before deposit, alternative options will be presented.<br>
-                3. <strong>Quote Validity:</strong> This quotation is valid for 48 Hours from issue date.
-            </div>
-
-            <div class="bank-box">
-                <strong>ALL PAYMENTS TO BE MADE TO EITHER OF THE FOLLOWING ACCOUNTS:</strong>
-                <div class="bank-grid">
+        <!-- PRINTABLE FORMAL QUOTE TEMPLATE (PDF target) - HIDDEN BY DEFAULT -->
+        <div id="previewArea" style="display: none;">
+            <div id="pdfTemplate">
+                <div class="q-header">
                     <div>
-                        <strong>Account Name:</strong> Niugini Open Biz<br>
-                        <strong>Account #:</strong> 7019659379<br>
-                        <strong>BANK:</strong> BSP | <strong>Branch:</strong> Waigani Drive<br>
-                        <strong>BSB Code:</strong> 088-968
+                        <img src="http://www.niuginibiz.com/wp-content/uploads/2026/08/logo.png" alt="Niugini Open Biz Logo" class="q-logo"><br>
+                        <div>Section 42, Lot 95, Galo Place, Angau Drive</div>
+                        <div>Boroko, Port Moresby NCD</div>
+                        <div>Mobile No. 7830 5513 / 77757633 / 7333 8200</div>
+                        <div>sales@niuginibiz.com</div>
                     </div>
-                    <div>
-                        <strong>Account Name:</strong> Niugini Open Biz<br>
-                        <strong>Account #:</strong> 27720114<br>
-                        <strong>BANK:</strong> KINA | <strong>Branch:</strong> Jacksons 7 Mile<br>
-                        <strong>BSB Code:</strong> 028-022
+                    <div style="text-align: right;">
+                        <h2 style="margin: 0; color: #0056b3;">Quote</h2>
+                        <div><strong>DATE:</strong> <span id="qDate">10-Aug-2026</span></div>
+                        <div><strong>Proforma Inv #:</strong> <span id="qInvNo">NBZ2630</span></div>
+                        <div><strong>Customer ID:</strong> Cash Sales</div>
+                        <div style="margin-top: 10px;"><strong>Quotation valid until:</strong></div>
+                        <div id="qValidDate">September 10, 2026</div>
+                        <div><strong>Prepared by:</strong> Sales</div>
                     </div>
                 </div>
+
+                <div class="q-billing-grid">
+                    <div>
+                        <strong>Bill To:</strong><br>
+                        <span id="qCustName">Kilala Rabbie Benson</span><br>
+                        <span id="qCustLocation">KAVIENG, NIP</span><br>
+                        <span id="qCustPhone">Ph. +67570630933</span><br>
+                        <span id="qCustEmail">Email: kilalarabbieb@gmail.com</span>
+                    </div>
+                </div>
+
+                <table class="q-table">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th style="width: 40px;">Qty</th>
+                            <th style="width: 100px; text-align: right;">Unit Price</th>
+                            <th style="width: 110px; text-align: right;">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <strong id="qVehName">NISSAN X-TRAIL T31 SUV (Japanese Used Vehicle)</strong><br>
+                                All-Inclusive Pre-Order & Landed Package<br><br>
+                                <strong>VEHICLE SPECIFICATIONS:</strong><br>
+                                Code / Stock Ref: <span id="qCode">CE139082</span><br><br>
+                                <strong>PACKAGE INCLUDES:</strong><br>
+                                • Vehicle Purchase & Pre-Shipment Inspection in Japan<br>
+                                • International RORO Ocean Freight to <span id="qPort">Port</span><br>
+                                • All PNG Customs Duties, Import Taxes (GST), & Port Handling Charges<br>
+                                • End-to-End Customs Clearance & Handover at <span id="qPort2">Port</span><br><br>
+                                <strong>PAYMENT TERMS (2-STAGE STRUCTURE):</strong><br>
+                                • <strong>60% Initial Deposit Required Upon Order Confirmation:</strong> <span id="qDeposit">K0.00</span><br>
+                                • <strong>40% Final Balance Due 1 Week Prior to Vessel Arrival:</strong> <span id="qBalance">K0.00</span><br><br>
+                                <strong>ESTIMATED DELIVERY TIMELINE:</strong><br>
+                                • ~8 Weeks from deposit confirmation to port arrival.
+                            </td>
+                            <td>1</td>
+                            <td style="text-align: right;" id="qUnitPrice">K 0.00</td>
+                            <td style="text-align: right; font-weight: bold;" id="qLineAmount">K 0.00</td>
+                        </tr>
+                        <tr class="q-total-row">
+                            <td colspan="3" style="text-align: right;">TOTAL</td>
+                            <td style="text-align: right; color: #0056b3;" id="qTotal">K 0.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div style="font-size: 10px; margin-top: 10px; color: #444;">
+                    <strong>IMPORTANT NOTICE ON VEHICLE AVAILABILITY & PRICING:</strong><br>
+                    1. <strong>Stock Availability:</strong> This quotation is based on active Japanese auction/supplier listing. Live inventory updates continuously and is subject to prior sale.<br>
+                    2. <strong>Price & Spec Guarantee:</strong> The quoted price applies specifically to this exact vehicle. If this unit is sold before deposit, alternative options will be presented.<br>
+                    3. <strong>Quote Validity:</strong> This quotation is valid for 48 Hours from issue date.
+                </div>
+
+                <div class="bank-box">
+                    <strong>ALL PAYMENTS TO BE MADE TO EITHER OF THE FOLLOWING ACCOUNTS:</strong>
+                    <div class="bank-grid">
+                        <div>
+                            <strong>Account Name:</strong> Niugini Open Biz<br>
+                            <strong>Account #:</strong> 7019659379<br>
+                            <strong>BANK:</strong> BSP | <strong>Branch:</strong> Waigani Drive<br>
+                            <strong>BSB Code:</strong> 088-968
+                        </div>
+                        <div>
+                            <strong>Account Name:</strong> Niugini Open Biz<br>
+                            <strong>Account #:</strong> 27720114<br>
+                            <strong>BANK:</strong> KINA | <strong>Branch:</strong> Jacksons 7 Mile<br>
+                            <strong>BSB Code:</strong> 028-022
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button class="btn-calc" style="background: #0056b3;" onclick="downloadOfficialPDF()">📥 Download Official Quote PDF</button>
             </div>
         </div>
 
-        <div style="display: flex; gap: 10px; margin-top: 15px;">
-            <button class="btn-calc" style="background: #0056b3;" onclick="downloadOfficialPDF()">📥 Download Official Quote PDF</button>
-        </div>
     </div>
 </div>
 
@@ -350,7 +389,8 @@
     }
 
     function openQuoteModal() {
-        renderPDFPreview();
+        // Hide preview section when modal is opened initially
+        document.getElementById('previewArea').style.display = 'none';
         document.getElementById('quoteModal').style.display = 'flex';
     }
 
@@ -358,7 +398,12 @@
         document.getElementById('quoteModal').style.display = 'none';
     }
 
-    function renderPDFPreview() {
+    function showQuotePreview() {
+        renderPDFData();
+        document.getElementById('previewArea').style.display = 'block';
+    }
+
+    function renderPDFData() {
         let name = document.getElementById('custNameInput').value || 'Kilala Rabbie Benson';
         let phone = document.getElementById('custPhoneInput').value || '+67570630933';
         let email = document.getElementById('custEmailInput').value || 'kilalarabbieb@gmail.com';
@@ -409,7 +454,7 @@
             margin:       0.3,
             filename:     `Quote_${invNo}_${custName}.pdf`,
             image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2 },
+            html2canvas:  { scale: 2, useCORS: true },
             jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
         };
 
