@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Niugini Open Biz | PNG Vehicle Landed Cost Calculator & Live Japan Stock</title>
+    
+    <!-- PDF Generation Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <style>
         :root {
             --primary: #0056b3;
@@ -181,23 +185,26 @@
             padding-top: 8px;
         }
 
-        .btn-wa {
+        .btn-quote {
             display: block;
+            width: 100%;
             text-align: center;
             background: var(--success);
             color: #ffffff;
-            text-decoration: none;
             font-weight: bold;
-            padding: 13px;
+            padding: 14px;
+            border: none;
             border-radius: 8px;
-            font-size: 15px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.2s ease;
         }
 
-        .btn-wa:hover {
+        .btn-quote:hover {
             background: #218838;
         }
 
-        /* Step Guide Accordion */
+        /* Guide Box */
         .guide-box {
             background: #fffbe6;
             border: 1px solid #ffe58f;
@@ -215,6 +222,98 @@
         .guide-box li {
             margin-bottom: 6px;
         }
+
+        /* Modal Popup Styling */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        .modal-card {
+            background: #fff;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px; right: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+        }
+
+        /* PDF Printable Layout */
+        #pdfTemplate {
+            padding: 10px;
+            background: #ffffff;
+            color: #222;
+        }
+
+        .pdf-header {
+            border-bottom: 2px solid #0056b3;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pdf-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+
+        .pdf-table th, .pdf-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .pdf-table th {
+            background-color: #f2f2f2;
+        }
+
+        .pdf-total-row {
+            background-color: #e6f0ff;
+            font-weight: bold;
+        }
+
+        .pdf-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 12px;
+            border-radius: 6px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-download { background: #0056b3; color: white; }
+        .btn-email { background: #28a745; color: white; }
     </style>
 </head>
 <body>
@@ -267,7 +366,7 @@
 
         <div class="form-group">
             <label>Be Forward Total CIF Price (USD $):</label>
-            <input type="number" id="usdCif" placeholder="e.g. 5500" value="5500">
+            <input type="number" id="usdCif" placeholder="e.g. 5113" value="5113">
         </div>
 
         <div class="form-group">
@@ -289,16 +388,90 @@
         <div id="resultBox" class="result-box">
             <div class="price-title">Total Driveaway Price (PGK):</div>
             <div class="price-value" id="totalPrice">K0.00</div>
-            <div class="deposit-value" id="depositPrice">60% Required Pre-Order Deposit: K0.00</div>
+            <div class="deposit-value" id="depositPrice">60% Pre-Order Deposit: K0.00</div>
             
             <p class="disclaimer">
                 *Package Price Includes: Full CIF Price (Vehicle + Ocean Freight + Insurance), PNG Customs Duty, GST, Port Wharfage & Local Agency Port Clearance Handling.
             </p>
 
-            <a id="waButton" href="#" target="_blank" class="btn-wa">💬 Reserve Vehicle via WhatsApp</a>
+            <button class="btn-quote" onclick="openQuoteModal()">📄 Get Official Quote Now</button>
         </div>
     </div>
 
+</div>
+
+<!-- QUOTATION GENERATOR MODAL -->
+<div id="quoteModal" class="modal-overlay">
+    <div class="modal-card">
+        <span class="close-modal" onclick="closeQuoteModal()">&times;</span>
+        
+        <!-- PRINTABLE PDF CONTENT -->
+        <div id="pdfTemplate">
+            <div class="pdf-header">
+                <div>
+                    <h2 style="margin:0; color:#0056b3;">Niugini Open Biz</h2>
+                    <small>Trading as NBZ Tech & Import Consultancy</small><br>
+                    <small>Port Moresby, Papua New Guinea | Phone: +675 7830 5513</small>
+                </div>
+                <div style="text-align:right;">
+                    <h3 style="margin:0; color:#555;">OFFICIAL QUOTE</h3>
+                    <small id="quoteRef">NOB-2026-001</small><br>
+                    <small id="quoteDate">Date: 10/08/2026</small>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom:10px;">
+                <label style="font-size:12px;">Customer Full Name / Organization:</label>
+                <input type="text" id="custName" placeholder="Enter your name or business name" style="padding:8px; font-size:13px;">
+            </div>
+
+            <div class="form-group" style="margin-bottom:10px;">
+                <label style="font-size:12px;">Customer Email Address:</label>
+                <input type="email" id="custEmail" placeholder="Enter email to send quote copy" style="padding:8px; font-size:13px;">
+            </div>
+
+            <table class="pdf-table">
+                <thead>
+                    <tr>
+                        <th>Import Item & Services Included</th>
+                        <th style="text-align:right;">Amount (PGK)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <strong>Vehicle Import Package (Pre-Order)</strong><br>
+                            <small>• Foreign Purchase CIF (USD Value Converted)</small><br>
+                            <small>• PNG Customs Duty & Import Excise Taxation</small><br>
+                            <small>• 10% Goods & Services Tax (GST)</small><br>
+                            <small>• Port Wharfage, Handling & Local Agency Clearance</small>
+                        </td>
+                        <td style="text-align:right; font-weight:bold;" id="pdfDriveaway">K0.00</td>
+                    </tr>
+                    <tr class="pdf-total-row">
+                        <td>TOTAL DRIVEAWAY LANDED COST</td>
+                        <td style="text-align:right; color:#0056b3; font-size:16px;" id="pdfTotal">K0.00</td>
+                    </tr>
+                    <tr style="background:#f9f9f9;">
+                        <td>REQUIRED 60% PRE-ORDER DEPOSIT</td>
+                        <td style="text-align:right; color:#28a745; font-weight:bold;" id="pdfDeposit">K0.00</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="font-size:11px; color:#666; line-height:1.4;">
+                <strong>Terms & Conditions:</strong><br>
+                1. Quotation is valid for 7 days based on exchange rate fluctuations.<br>
+                2. 60% deposit is required to secure Japan auction/Be Forward inventory and initiate ocean shipment.<br>
+                3. Final 40% balance is payable upon vessel arrival and port customs clearance in PNG.
+            </div>
+        </div>
+
+        <div class="pdf-actions">
+            <button class="btn-action btn-download" onclick="downloadPDF()">📥 Download PDF</button>
+            <button class="btn-action btn-email" onclick="sendEmailQuote()">✉️ Email Quote to Me</button>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -321,6 +494,9 @@
     }
     fetchFxRate();
 
+    let calculatedTotal = 0;
+    let calculatedDeposit = 0;
+
     // Calculation Engine
     function calculateCost() {
         const agentFeePGK = 1500;   // Agency Clearance Fee
@@ -329,7 +505,6 @@
         let cifUSD = parseFloat(document.getElementById('usdCif').value) || 0;
         let dutyRate = parseFloat(document.getElementById('dutyRate').value);
         let wharfagePGK = parseFloat(document.getElementById('portWharfage').value);
-        let portName = document.getElementById('portWharfage').options[document.getElementById('portWharfage').selectedIndex].text;
 
         // 1. CIF Conversion to PGK
         let cifPGK = cifUSD * liveUsdToPgk;
@@ -339,20 +514,64 @@
         let gstPGK = (cifPGK + dutyPGK) * 0.10;
 
         // 3. Driveaway Price (CIF + Duty + GST + Wharfage + Clearance Agent Fee + K10,000 Markup)
-        let totalDriveawayPrice = cifPGK + dutyPGK + gstPGK + wharfagePGK + agentFeePGK + markupPGK;
-
-        let deposit60 = totalDriveawayPrice * 0.60;
+        calculatedTotal = cifPGK + dutyPGK + gstPGK + wharfagePGK + agentFeePGK + markupPGK;
+        calculatedDeposit = calculatedTotal * 0.60;
 
         // Display Results
-        document.getElementById('totalPrice').innerText = 'K ' + Math.round(totalDriveawayPrice).toLocaleString();
-        document.getElementById('depositPrice').innerText = '60% Pre-Order Deposit: K ' + Math.round(deposit60).toLocaleString();
-
-        // WhatsApp Payload
-        let waMessage = `Hi Niugini Open Biz! I calculated a driveaway quote on your site.\n\n- CIF Price: $${cifUSD} USD\n- Destination Port: ${portName}\n- Total Driveaway Quote: K${Math.round(totalDriveawayPrice).toLocaleString()}\n- Required 60% Deposit: K${Math.round(deposit60).toLocaleString()}\n\nPlease help me verify and process this order!`;
-        
-        document.getElementById('waButton').href = `https://wa.me/67578305513?text=${encodeURIComponent(waMessage)}`;
+        document.getElementById('totalPrice').innerText = 'K ' + Math.round(calculatedTotal).toLocaleString();
+        document.getElementById('depositPrice').innerText = '60% Pre-Order Deposit: K ' + Math.round(calculatedDeposit).toLocaleString();
 
         document.getElementById('resultBox').style.display = 'block';
+    }
+
+    // Modal Control Functions
+    function openQuoteModal() {
+        let randomRef = 'NOB-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
+        let today = new Date().toLocaleDateString('en-GB');
+
+        document.getElementById('quoteRef').innerText = randomRef;
+        document.getElementById('quoteDate').innerText = 'Date: ' + today;
+        document.getElementById('pdfDriveaway').innerText = 'K ' + Math.round(calculatedTotal).toLocaleString();
+        document.getElementById('pdfTotal').innerText = 'K ' + Math.round(calculatedTotal).toLocaleString();
+        document.getElementById('pdfDeposit').innerText = 'K ' + Math.round(calculatedDeposit).toLocaleString();
+
+        document.getElementById('quoteModal').style.display = 'flex';
+    }
+
+    function closeQuoteModal() {
+        document.getElementById('quoteModal').style.display = 'none';
+    }
+
+    // Download PDF Function
+    function downloadPDF() {
+        let element = document.getElementById('pdfTemplate');
+        let name = document.getElementById('custName').value || 'Customer';
+        
+        let opt = {
+            margin:       0.5,
+            filename:     `Niugini_Open_Biz_Quote_${name.replace(/\s+/g, '_')}.pdf`,
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2 },
+            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(element).save();
+    }
+
+    // Email Quote Function
+    function sendEmailQuote() {
+        let email = document.getElementById('custEmail').value;
+        let name = document.getElementById('custName').value || 'Valued Customer';
+
+        if(!email) {
+            alert('Please enter your email address to receive the quote.');
+            return;
+        }
+
+        let subject = encodeURIComponent(`Niugini Open Biz - Vehicle Import Quotation (${document.getElementById('quoteRef').innerText})`);
+        let body = encodeURIComponent(`Hi ${name},\n\nThank you for requesting a vehicle import quotation from Niugini Open Biz.\n\nSummary of Driveaway Quote:\n- Total Driveaway Landed Price: K${Math.round(calculatedTotal).toLocaleString()}\n- Required 60% Deposit: K${Math.round(calculatedDeposit).toLocaleString()}\n\nOur team has received a copy of this request and will follow up with you shortly.\n\nBest regards,\nNiugini Open Biz Consultancy\nPort Moresby, PNG`);
+
+        window.location.href = `mailto:${email}?cc=info@niuginibiz.com&subject=${subject}&body=${body}`;
     }
 </script>
 
