@@ -3,38 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Niugini Open Biz - Quote & Task Application</title>
+  <title>Niugini Open Biz - Quote & Price Calculator</title>
   
-  <!-- Tailwind CSS CDN for Modern Styling -->
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- html2canvas CDN for Reliable Image Export -->
+  <!-- html2canvas CDN for Image Export -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   
   <style>
     @media print {
-      .no-print {
-        display: none !important;
-      }
-      body {
-        background: #ffffff !important;
-        padding: 0 !important;
-      }
-      #quote-container {
-        box-shadow: none !important;
-        border: none !important;
-        width: 100% !important;
-      }
+      .no-print { display: none !important; }
+      body { background: #ffffff !important; padding: 0 !important; }
+      #quote-container { box-shadow: none !important; border: none !important; width: 100% !important; }
     }
   </style>
 </head>
 <body class="bg-slate-100 min-h-screen text-slate-800 p-4 sm:p-8">
 
-  <!-- TOP ACTION BAR (Hidden when downloading or printing) -->
+  <!-- TOP BAR / ACTIONS -->
   <div class="max-w-4xl mx-auto mb-6 flex flex-wrap items-center justify-between gap-4 no-print">
     <div>
-      <h1 class="text-xl font-bold text-slate-900">Document Generator</h1>
-      <p class="text-sm text-slate-500">Export as a high-resolution PNG image to prevent blank PDF pages.</p>
+      <h1 class="text-xl font-bold text-slate-900">Interactive Quote Calculator</h1>
+      <p class="text-sm text-slate-500">Calculate prices dynamically and export as a crisp PNG image.</p>
     </div>
     <div class="flex items-center gap-3">
       <button onclick="window.print()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg text-sm transition">
@@ -47,23 +38,20 @@
     </div>
   </div>
 
-  <!-- MAIN QUOTE / DOCUMENT CONTAINER -->
+  <!-- MAIN QUOTE CONTAINER -->
   <main id="quote-container" class="max-w-4xl mx-auto bg-white p-8 sm:p-12 rounded-2xl shadow-xl border border-slate-200">
     
-    <!-- HEADER SECTION WITH NIUGINI OPEN BIZ BRANDING -->
+    <!-- BRAND HEADER -->
     <header class="flex flex-col sm:flex-row sm:items-center justify-between pb-8 border-b-2 border-slate-100 gap-6">
       
-      <!-- High-Impact Pure Text Branding -->
+      <!-- Text Branding -->
       <div class="flex items-center gap-4">
-        <!-- Badge Icon / Monogram -->
         <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-blue-700 text-white font-black text-2xl tracking-wider px-4 py-3 rounded-2xl shadow-sm flex items-center justify-center">
           NOB
         </div>
         
-        <!-- Divider -->
         <div class="h-12 w-0.5 bg-slate-200 hidden sm:block"></div>
         
-        <!-- Main Company Titles -->
         <div class="flex flex-col">
           <span class="text-2xl font-black tracking-tight text-slate-900 uppercase">
             Niugini Open Biz
@@ -74,17 +62,17 @@
         </div>
       </div>
 
-      <!-- Quote Meta Details -->
+      <!-- Quote Meta -->
       <div class="text-left sm:text-right">
         <span class="inline-block px-3 py-1 bg-blue-50 text-blue-700 text-xs font-bold rounded-full uppercase tracking-wider mb-2">
           OFFICIAL QUOTATION
         </span>
-        <p class="text-sm font-semibold text-slate-600">Quote #: <span class="text-slate-900">NOB-2026-001</span></p>
-        <p class="text-xs text-slate-500 mt-1">Date: August 12, 2026</p>
+        <p class="text-sm font-semibold text-slate-600">Quote #: <span class="text-slate-900" id="quote-number">NOB-2026-001</span></p>
+        <p class="text-xs text-slate-500 mt-1" id="quote-date"></p>
       </div>
     </header>
 
-    <!-- CLIENT & PROVIDER DETAILS -->
+    <!-- CLIENT DETAILS EDITABLE -->
     <section class="grid grid-cols-1 sm:grid-cols-2 gap-8 my-8 text-sm">
       <div>
         <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Prepared By</h3>
@@ -95,42 +83,66 @@
       </div>
       <div>
         <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Prepared For</h3>
-        <p class="font-bold text-slate-800 text-base">Client Name / Organization</p>
-        <p class="text-slate-600">Department / Branch</p>
-        <p class="text-slate-600">Port Moresby, NCD</p>
+        <input type="text" placeholder="Client Name / Organization" class="w-full font-bold text-slate-800 text-base mb-1 p-1 -ml-1 rounded hover:bg-slate-50 focus:bg-white focus:outline-blue-500" value="Client Name / Organization">
+        <input type="text" placeholder="Department / Branch" class="w-full text-slate-600 p-1 -ml-1 rounded hover:bg-slate-50 focus:bg-white focus:outline-blue-500" value="Department / Branch">
+        <input type="text" placeholder="Location" class="w-full text-slate-600 p-1 -ml-1 rounded hover:bg-slate-50 focus:bg-white focus:outline-blue-500" value="Port Moresby, NCD">
       </div>
     </section>
 
-    <!-- ITEMS TABLE -->
+    <!-- CALCULATOR / ITEMS TABLE -->
     <section class="my-8">
-      <table class="w-full text-left border-collapse">
+      <table class="w-full text-left border-collapse" id="items-table">
         <thead>
           <tr class="bg-slate-50 border-y border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
-            <th class="py-3 px-4">Description</th>
-            <th class="py-3 px-4 text-center">Qty</th>
-            <th class="py-3 px-4 text-right">Unit Price (PGK)</th>
-            <th class="py-3 px-4 text-right">Amount (PGK)</th>
+            <th class="py-3 px-4">Item Description</th>
+            <th class="py-3 px-4 text-center w-20">Qty</th>
+            <th class="py-3 px-4 text-right w-36">Unit Price (PGK)</th>
+            <th class="py-3 px-4 text-right w-36">Amount (PGK)</th>
+            <th class="py-3 px-2 w-10 no-print"></th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-slate-100 text-sm">
-          <tr>
-            <td class="py-4 px-4 font-medium text-slate-800">
-              Web Application Development & Task Logging Setup
+        <tbody class="divide-y divide-slate-100 text-sm" id="table-body">
+          <!-- Default Row 1 -->
+          <tr class="item-row">
+            <td class="py-3 px-4">
+              <input type="text" class="w-full font-medium text-slate-800 p-1 rounded hover:bg-slate-50 focus:bg-white focus:outline-blue-500" value="Web Application Development & Task Logging Setup">
             </td>
-            <td class="py-4 px-4 text-center">1</td>
-            <td class="py-4 px-4 text-right">10,000.00</td>
-            <td class="py-4 px-4 text-right font-semibold">10,000.00</td>
+            <td class="py-3 px-4 text-center">
+              <input type="number" min="1" value="1" oninput="calculateTotal()" class="qty-input w-16 text-center border border-slate-200 rounded p-1">
+            </td>
+            <td class="py-3 px-4 text-right">
+              <input type="number" step="0.01" value="10000" oninput="calculateTotal()" class="price-input w-28 text-right border border-slate-200 rounded p-1">
+            </td>
+            <td class="py-3 px-4 text-right font-semibold row-amount">10,000.00</td>
+            <td class="py-3 px-2 text-center no-print">
+              <button onclick="removeRow(this)" class="text-red-400 hover:text-red-600 font-bold">&times;</button>
+            </td>
           </tr>
-          <tr>
-            <td class="py-4 px-4 font-medium text-slate-800">
-              Cloud Data Sync & Infrastructure Integration
+          <!-- Default Row 2 -->
+          <tr class="item-row">
+            <td class="py-3 px-4">
+              <input type="text" class="w-full font-medium text-slate-800 p-1 rounded hover:bg-slate-50 focus:bg-white focus:outline-blue-500" value="Cloud Data Sync & Infrastructure Integration">
             </td>
-            <td class="py-4 px-4 text-center">1</td>
-            <td class="py-4 px-4 text-right">5,400.00</td>
-            <td class="py-4 px-4 text-right font-semibold">5,400.00</td>
+            <td class="py-3 px-4 text-center">
+              <input type="number" min="1" value="1" oninput="calculateTotal()" class="qty-input w-16 text-center border border-slate-200 rounded p-1">
+            </td>
+            <td class="py-3 px-4 text-right">
+              <input type="number" step="0.01" value="5400" oninput="calculateTotal()" class="price-input w-28 text-right border border-slate-200 rounded p-1">
+            </td>
+            <td class="py-3 px-4 text-right font-semibold row-amount">5,400.00</td>
+            <td class="py-3 px-2 text-center no-print">
+              <button onclick="removeRow(this)" class="text-red-400 hover:text-red-600 font-bold">&times;</button>
+            </td>
           </tr>
         </tbody>
       </table>
+
+      <!-- Add Row Button -->
+      <div class="mt-4 no-print">
+        <button onclick="addRow()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-md transition flex items-center gap-1">
+          + Add Line Item
+        </button>
+      </div>
     </section>
 
     <!-- TOTALS SECTION -->
@@ -138,15 +150,18 @@
       <div class="w-full sm:w-1/2 space-y-3 text-sm">
         <div class="flex justify-between text-slate-600">
           <span>Subtotal</span>
-          <span class="font-semibold text-slate-800">K15,400.00</span>
+          <span class="font-semibold text-slate-800" id="subtotal">K15,400.00</span>
         </div>
         <div class="flex justify-between text-slate-600">
-          <span>Tax / GST</span>
-          <span class="font-semibold text-slate-800">K0.00</span>
+          <span>GST / Tax (%)</span>
+          <div class="flex items-center gap-2">
+            <input type="number" id="tax-rate" value="0" min="0" max="100" oninput="calculateTotal()" class="w-14 text-right border border-slate-200 rounded p-1 text-xs no-print">
+            <span class="font-semibold text-slate-800" id="tax-amount">K0.00</span>
+          </div>
         </div>
         <div class="flex justify-between text-base font-black text-slate-900 border-t border-slate-200 pt-3">
           <span>Total Investment</span>
-          <span class="text-blue-600">K15,400.00</span>
+          <span class="text-blue-600" id="grand-total">K15,400.00</span>
         </div>
       </div>
     </section>
@@ -159,23 +174,86 @@
 
   </main>
 
-  <!-- JAVASCRIPT FOR IMAGE EXPORT -->
+  <!-- CALCULATOR LOGIC & EXPORT -->
   <script>
+    // Set Current Date
+    document.getElementById('quote-date').innerText = 'Date: ' + new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    // Formatting currency
+    function formatPGK(amount) {
+      return 'K' + amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // Main Calculator Logic
+    function calculateTotal() {
+      const rows = document.querySelectorAll('.item-row');
+      let subtotal = 0;
+
+      rows.forEach(row => {
+        const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
+        const price = parseFloat(row.querySelector('.price-input').value) || 0;
+        const amount = qty * price;
+
+        subtotal += amount;
+        row.querySelector('.row-amount').innerText = amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      });
+
+      const taxRate = parseFloat(document.getElementById('tax-rate').value) || 0;
+      const taxAmount = subtotal * (taxRate / 100);
+      const grandTotal = subtotal + taxAmount;
+
+      document.getElementById('subtotal').innerText = formatPGK(subtotal);
+      document.getElementById('tax-amount').innerText = formatPGK(taxAmount);
+      document.getElementById('grand-total').innerText = formatPGK(grandTotal);
+    }
+
+    // Add New Line Item Row
+    function addRow() {
+      const tbody = document.getElementById('table-body');
+      const tr = document.createElement('tr');
+      tr.className = 'item-row';
+      tr.innerHTML = `
+        <td class="py-3 px-4">
+          <input type="text" class="w-full font-medium text-slate-800 p-1 rounded hover:bg-slate-50 focus:bg-white focus:outline-blue-500" placeholder="Item description...">
+        </td>
+        <td class="py-3 px-4 text-center">
+          <input type="number" min="1" value="1" oninput="calculateTotal()" class="qty-input w-16 text-center border border-slate-200 rounded p-1">
+        </td>
+        <td class="py-3 px-4 text-right">
+          <input type="number" step="0.01" value="0.00" oninput="calculateTotal()" class="price-input w-28 text-right border border-slate-200 rounded p-1">
+        </td>
+        <td class="py-3 px-4 text-right font-semibold row-amount">0.00</td>
+        <td class="py-3 px-2 text-center no-print">
+          <button onclick="removeRow(this)" class="text-red-400 hover:text-red-600 font-bold">&times;</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+      calculateTotal();
+    }
+
+    // Remove Line Item
+    function removeRow(button) {
+      const row = button.closest('tr');
+      row.remove();
+      calculateTotal();
+    }
+
+    // Export Canvas/Image Logic
     async function exportQuoteAsImage() {
       const element = document.getElementById('quote-container');
       
       try {
-        // High quality rendering using html2canvas
         const canvas = await html2canvas(element, {
-          scale: 2, // 2x resolution for high definition
+          scale: 2,
           useCORS: true,
           backgroundColor: '#ffffff'
         });
 
-        // Convert canvas to base64 image link
         const image = canvas.toDataURL('image/png', 1.0);
-        
-        // Trigger automatic browser download
         const downloadLink = document.createElement('a');
         downloadLink.href = image;
         downloadLink.download = 'Quote_NiuginiBiz.png';
@@ -187,6 +265,9 @@
         alert('Failed to generate image. Please try again.');
       }
     }
+
+    // Initial Calculation
+    calculateTotal();
   </script>
 </body>
 </html>
