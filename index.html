@@ -1,565 +1,192 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Niugini Open Biz | PNG Vehicle Landed Cost Calculator</title>
-    
-    <!-- PDF Generation Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
-    <style>
-        :root {
-            --primary: #0056b3;
-            --primary-hover: #003d80;
-            --success: #28a745;
-            --dark: #222222;
-            --light-bg: #f4f6f9;
-            --card-bg: #ffffff;
-            --border: #e1e4e8;
-        }
-
-        body {
-            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
-            background-color: var(--light-bg);
-            color: #333333;
-            margin: 0;
-            padding: 20px;
-            line-height: 1.5;
-        }
-
-        .container {
-            max-width: 680px;
-            margin: 0 auto;
-        }
-
-        .card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 4px 18px rgba(0,0,0,0.06);
-            margin-bottom: 20px;
-            border: 1px solid var(--border);
-        }
-
-        .header-logo-container {
-            text-align: center;
-            margin-bottom: 12px;
-        }
-        
-        /* BRAND LOGO STYLES */
-        .brand-logo-svg {
-            max-width: 260px;
-            height: auto;
-            display: inline-block;
-        }
-
-        h1, h2, h3 { color: var(--dark); margin-top: 0; }
-        .header-sub { text-align: center; font-size: 14px; color: #666; margin-bottom: 20px; font-weight: 500; }
-
-        .rate-badge {
-            font-size: 13px; color: #155724; background-color: #d4edda;
-            border: 1px solid #c3e6cb; padding: 8px 12px; border-radius: 8px;
-            margin-bottom: 20px; text-align: center; font-weight: 600;
-        }
-
-        /* INSTRUCTION NOTE BOX */
-        .instruction-box {
-            background-color: #fff8e1;
-            border-left: 5px solid #ffc107;
-            padding: 16px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            color: #444;
-        }
-        .instruction-box h4 {
-            margin: 0 0 10px 0;
-            color: #b78103;
-            font-size: 15px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .instruction-box ol {
-            margin: 0;
-            padding-left: 20px;
-        }
-        .instruction-box li {
-            margin-bottom: 6px;
-        }
-
-        .model-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 10px; margin-top: 12px;
-        }
-
-        .btn-model {
-            display: block; text-align: center; background: #f8f9fa;
-            border: 1px solid var(--border); padding: 10px 8px; border-radius: 8px;
-            text-decoration: none; color: #333; font-weight: 600; font-size: 13px;
-            transition: all 0.2s ease;
-        }
-
-        .btn-model:hover { background: var(--primary); color: #ffffff; border-color: var(--primary); }
-
-        .form-group { margin-bottom: 16px; }
-        label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 14px; }
-        select, input {
-            width: 100%; padding: 12px; border: 1px solid #ccc;
-            border-radius: 8px; font-size: 15px; box-sizing: border-box; background: #fff;
-        }
-
-        .btn-calc {
-            width: 100%; background: var(--primary); color: #ffffff; font-weight: bold;
-            padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;
-        }
-        .btn-calc:hover { background: var(--primary-hover); }
-
-        .result-box {
-            margin-top: 20px; background: #f0f7ff; border: 1px solid #b8daff;
-            padding: 20px; border-radius: 10px; display: none;
-        }
-        .price-title { font-size: 12px; text-transform: uppercase; color: #555; font-weight: 700; }
-        .price-value { font-size: 32px; font-weight: 800; color: var(--primary); margin: 4px 0; }
-        .deposit-value { font-size: 16px; font-weight: 700; color: var(--success); margin-bottom: 12px; }
-
-        .btn-quote {
-            display: block; width: 100%; text-align: center; background: var(--success);
-            color: #ffffff; font-weight: bold; padding: 14px; border: none;
-            border-radius: 8px; font-size: 16px; cursor: pointer;
-        }
-        .btn-quote:hover { background: #218838; }
-
-        /* Modal Overlay */
-        .modal-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center;
-            align-items: center; padding: 15px; box-sizing: border-box;
-        }
-        .modal-card {
-            background: #fff; max-width: 780px; width: 100%; max-height: 90vh;
-            overflow-y: auto; border-radius: 12px; padding: 25px; position: relative;
-        }
-        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #666; }
-
-        /* PDF DOCUMENT SPECIFIC STYLES */
-        #pdfTemplate {
-            padding: 25px; background: #ffffff; color: #000; font-size: 11px; font-family: Arial, sans-serif;
-            box-sizing: border-box; width: 100%;
-        }
-        .q-header { display: flex; justify-content: space-between; border-bottom: 2px solid #222; padding-bottom: 10px; }
-        .q-logo-wrap { max-width: 180px; margin-bottom: 6px; }
-        .q-billing-grid { display: flex; justify-content: space-between; margin: 15px 0; }
-        .q-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .q-table th, .q-table td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-        .q-table th { background: #f2f2f2; }
-        .q-total-row { font-size: 13px; font-weight: bold; background: #e9ecef; }
-        .bank-box { background: #f8f9fa; border: 1px solid #ddd; padding: 10px; margin-top: 15px; font-size: 10.5px; }
-        .bank-grid { display: flex; justify-content: space-between; margin-top: 5px; }
-
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        
-        .action-btn-group {
-            display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;
-        }
-        .btn-action {
-            flex: 1; min-width: 200px; padding: 12px; border: none; border-radius: 8px;
-            font-weight: bold; cursor: pointer; font-size: 14px; text-align: center; color: #fff;
-        }
-        .btn-pdf { background: #0056b3; }
-        .btn-pdf:hover { background: #003d80; }
-        .btn-email { background: #28a745; }
-        .btn-email:hover { background: #1e7e34; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Niugini Open Biz - Quote & Task Application</title>
+  
+  <!-- Tailwind CSS CDN for Modern Styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- html2canvas CDN for Reliable Image Export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  
+  <style>
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+      body {
+        background: #ffffff !important;
+        padding: 0 !important;
+      }
+      #quote-container {
+        box-shadow: none !important;
+        border: none !important;
+        width: 100% !important;
+      }
+    }
+  </style>
 </head>
-<body>
+<body class="bg-slate-100 min-h-screen text-slate-800 p-4 sm:p-8">
 
-<div class="container">
-
-    <!-- HEADER CARD -->
-    <div class="card">
-        <div class="header-logo-container">
-            <!-- EMBEDDED VECTOR LOGO FOR 100% RELIABILITY -->
-            <svg class="brand-logo-svg" viewBox="0 0 320 60" xmlns="http://www.w3.org/2000/svg">
-                <rect width="320" height="60" rx="8" fill="#0a192f"/>
-                <circle cx="35" cy="30" r="18" fill="#e63946"/>
-                <path d="M 27 30 L 33 22 L 39 30 L 33 38 Z" fill="#ffffff"/>
-                <text x="65" y="28" font-family="'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="800" fill="#ffffff" letter-spacing="0.5">NIUGINI OPEN BIZ</text>
-                <text x="65" y="44" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#00b4d8" letter-spacing="1">VEHICLE IMPORT & LOGISTICS</text>
-            </svg>
-        </div>
-        <p class="header-sub">Vehicle Import Pre-Order & Driveaway Cost Calculator</p>
-        <div id="rateStatus" class="rate-badge">🔄 Fetching Live USD-PGK Exchange Rate...</div>
-
-        <!-- INSTRUCTION NOTE BOX -->
-        <div class="instruction-box">
-            <h4>💡 How to Calculate Your Driveaway Price (3 Easy Steps):</h4>
-            <ol>
-                <li>Click any PNG Top Seller model button below to search live stock on Be Forward.</li>
-                <li>On the vehicle page, select <strong>Papua New Guinea + Your Destination Port</strong> to get the total CIF Price (USD).</li>
-                <li>Enter the CIF USD Price into the calculator below to get your complete Landed Driveaway PGK Price!</li>
-            </ol>
-        </div>
-
-        <h3>🚗 PNG's Top Imported Models (Browse Live Stock):</h3>
-        <div class="model-grid">
-            <a href="https://www.beforward.jp/stocklist/make=1/model=212/sortkey=a?refer_bfs=875341" target="_blank" class="btn-model">Toyota Mark X</a>
-            <a href="https://www.beforward.jp/stocklist/make=3/model=473/sortkey=a?refer_bfs=875341" target="_blank" class="btn-model">Nissan X-Trail</a>
-            <a href="https://www.beforward.jp/stocklist/make=1/model=207/sortkey=a?refer_bfs=875341" target="_blank" class="btn-model">Toyota Mark II</a>
-            <a href="https://www.beforward.jp/stocklist/make=4/model=13365/sortkey=a?refer_bfs=875341" target="_blank" class="btn-model">Mazda CX-5</a>
-            <a href="https://www.beforward.jp/stocklist/make=1/model=181/sortkey=a?refer_bfs=875341" target="_blank" class="btn-model">Toyota Harrier</a>
-            <a href="https://www.beforward.jp/stocklist/make=4/model=475/sortkey=a?refer_bfs=875341" target="_blank" class="btn-model">Mazda Atenza</a>
-            <a href="https://www.beforward.jp/stocklist/make=1/model=151/sortkey=a?refer_bfs=875341" target="_blank" class="btn-model">Toyota Crown</a>
-            <a href="https://www.beforward.jp/stocklist/make=3/model=364/sortkey=a?refer_bfs=875341" target="_blank" class="btn-model">Nissan Sylphy</a>
-        </div>
+  <!-- TOP ACTION BAR (Hidden when downloading or printing) -->
+  <div class="max-w-4xl mx-auto mb-6 flex flex-wrap items-center justify-between gap-4 no-print">
+    <div>
+      <h1 class="text-xl font-bold text-slate-900">Document Generator</h1>
+      <p class="text-sm text-slate-500">Export as a high-resolution PNG image to prevent blank PDF pages.</p>
     </div>
-
-    <!-- CALCULATOR CARD -->
-    <div class="card">
-        <h2>🧮 Driveaway Landed Cost Calculator</h2>
-        
-        <div class="form-group">
-            <label>Vehicle Category (PNG Customs Duty Rate):</label>
-            <select id="dutyRate">
-                <option value="0.20">Compact SUV / 4WD (e.g., X-Trail, RAV4, CR-V - 20% Duty)</option>
-                <option value="0.45">Sedan / Hatchback (e.g., Mark X, Axio, Demio - 45% Duty)</option>
-                <option value="0.25">Large SUV / Passenger Van (e.g., Harrier, Prado, HiAce - 25% Duty)</option>
-                <option value="0.10">Commercial / Pickup Truck (e.g., Hilux, D-Max - 10% Duty)</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label>Be Forward Total CIF Price (USD $):</label>
-            <input type="number" id="usdCif" placeholder="e.g. 5113" value="5113">
-        </div>
-
-        <div class="form-group">
-            <label>Destination Port in PNG:</label>
-            <select id="portWharfage">
-                <option value="1950">Port Moresby Port</option>
-                <option value="1950">Lae Port</option>
-                <option value="2500">Kavieng Port</option>
-                <option value="2500">Rabaul / Kokopo Port</option>
-                <option value="2500">Kimbe Port</option>
-                <option value="2500">Buka Port</option>
-                <option value="2500">Kiunga Port</option>
-            </select>
-        </div>
-
-        <button class="btn-calc" onclick="calculateCost()">Calculate Total Driveaway Cost</button>
-
-        <div id="resultBox" class="result-box">
-            <div class="price-title">Total Driveaway Price (PGK):</div>
-            <div class="price-value" id="totalPrice">K0.00</div>
-            <div class="deposit-value" id="depositPrice">60% Pre-Order Deposit: K0.00</div>
-            
-            <button class="btn-quote" onclick="openQuoteModal()">📄 Generate Official Proforma Quotation</button>
-        </div>
+    <div class="flex items-center gap-3">
+      <button onclick="window.print()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg text-sm transition">
+        Print
+      </button>
+      <button onclick="exportQuoteAsImage()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg text-sm shadow-md transition flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        Download as Image (PNG)
+      </button>
     </div>
+  </div>
 
-</div>
-
-<!-- OFFICIAL QUOTE GENERATOR MODAL -->
-<div id="quoteModal" class="modal-overlay">
-    <div class="modal-card">
-        <span class="close-modal" onclick="closeQuoteModal()">&times;</span>
-        
-        <h3>📝 Enter Customer Details for Official Quote</h3>
-        <div class="form-grid">
-            <input type="text" id="custNameInput" placeholder="Customer Full Name (e.g. Kilala Rabbie Benson)">
-            <input type="text" id="custPhoneInput" placeholder="Phone Number (e.g. +675 70630933)">
-            <input type="email" id="custEmailInput" placeholder="Customer Email">
-            <input type="text" id="custLocationInput" placeholder="Town / Province (e.g. KAVIENG, NIP)">
-            <input type="text" id="vehModelInput" placeholder="Vehicle Name (e.g. NISSAN X-TRAIL T31 SUV)">
-            <input type="text" id="stockRefInput" placeholder="Be Forward Stock Code (e.g. CE139082)">
+  <!-- MAIN QUOTE / DOCUMENT CONTAINER -->
+  <main id="quote-container" class="max-w-4xl mx-auto bg-white p-8 sm:p-12 rounded-2xl shadow-xl border border-slate-200">
+    
+    <!-- HEADER SECTION WITH NIUGINI OPEN BIZ BRANDING -->
+    <header class="flex flex-col sm:flex-row sm:items-center justify-between pb-8 border-b-2 border-slate-100 gap-6">
+      
+      <!-- High-Impact Pure Text Branding -->
+      <div class="flex items-center gap-4">
+        <!-- Badge Icon / Monogram -->
+        <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-blue-700 text-white font-black text-2xl tracking-wider px-4 py-3 rounded-2xl shadow-sm flex items-center justify-center">
+          NOB
         </div>
-
-        <button class="btn-calc" style="margin-bottom: 20px;" onclick="showQuotePreview()">Preview Quotation</button>
-
-        <!-- PRINTABLE FORMAL QUOTE TEMPLATE -->
-        <div id="previewArea" style="display: none;">
-            <div id="pdfTemplate">
-                <div class="q-header">
-                    <div>
-                        <div class="q-logo-wrap">
-                            <svg viewBox="0 0 320 60" xmlns="http://www.w3.org/2000/svg" style="width: 170px; height: auto;">
-                                <rect width="320" height="60" rx="6" fill="#0a192f"/>
-                                <circle cx="35" cy="30" r="18" fill="#e63946"/>
-                                <path d="M 27 30 L 33 22 L 39 30 L 33 38 Z" fill="#ffffff"/>
-                                <text x="65" y="28" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#ffffff">NIUGINI OPEN BIZ</text>
-                                <text x="65" y="44" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#00b4d8">VEHICLE IMPORT & LOGISTICS</text>
-                            </svg>
-                        </div>
-                        <div>Section 42, Lot 95, Galo Place, Angau Drive</div>
-                        <div>Boroko, Port Moresby NCD</div>
-                        <div>Mobile No. 7830 5513 / 77757633 / 7333 8200</div>
-                        <div>sales@niuginibiz.com</div>
-                    </div>
-                    <div style="text-align: right;">
-                        <h2 style="margin: 0; color: #0056b3;">Quote</h2>
-                        <div><strong>DATE:</strong> <span id="qDate">12-Aug-26</span></div>
-                        <div><strong>Proforma Inv #:</strong> <span id="qInvNo">NBZ26PO001</span></div>
-                        <div><strong>Customer ID:</strong> Cash Sales</div>
-                        <div style="margin-top: 8px;"><strong>Quotation valid until:</strong></div>
-                        <div id="qValidDate">September 12, 2026</div>
-                        <div><strong>Prepared by:</strong> Sales</div>
-                    </div>
-                </div>
-
-                <div class="q-billing-grid">
-                    <div>
-                        <strong>Bill To:</strong><br>
-                        <span id="qCustName">Kilala Rabbie Benson</span><br>
-                        <span id="qCustLocation">KAVIENG, NIP</span><br>
-                        <span id="qCustPhone">Ph. +67570630933</span><br>
-                        <span id="qCustEmail">Email: kilalarabbieb@gmail.com</span>
-                    </div>
-                </div>
-
-                <table class="q-table">
-                    <thead>
-                        <tr>
-                            <th>Description</th>
-                            <th style="width: 35px;">Qty</th>
-                            <th style="width: 95px; text-align: right;">Unit Price</th>
-                            <th style="width: 105px; text-align: right;">Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <strong id="qVehName">NISSAN X-TRAIL T31 SUV (Japanese Used Vehicle)</strong><br>
-                                All-Inclusive Pre-Order & Landed Package<br><br>
-                                <strong>VEHICLE SPECIFICATIONS:</strong><br>
-                                Code / Stock Ref: <span id="qCode">CE139082</span><br><br>
-                                <strong>PACKAGE INCLUDES:</strong><br>
-                                • Vehicle Purchase & Pre-Shipment Inspection in Japan<br>
-                                • International RORO Ocean Freight to <span id="qPort">Port</span><br>
-                                • All PNG Customs Duties, Import Taxes (GST), & Port Handling Charges<br>
-                                • End-to-End Customs Clearance & Handover at <span id="qPort2">Port</span><br><br>
-                                <strong>PAYMENT TERMS (2-STAGE STRUCTURE):</strong><br>
-                                • <strong>60% Initial Deposit Required Upon Order Confirmation:</strong> <span id="qDeposit">K0.00</span><br>
-                                • <strong>40% Final Balance Due 1 Week Prior to Vessel Arrival:</strong> <span id="qBalance">K0.00</span><br><br>
-                                <strong>ESTIMATED DELIVERY TIMELINE:</strong><br>
-                                • ~8 Weeks from deposit confirmation to port arrival.
-                            </td>
-                            <td>1</td>
-                            <td style="text-align: right;" id="qUnitPrice">K 0.00</td>
-                            <td style="text-align: right; font-weight: bold;" id="qLineAmount">K 0.00</td>
-                        </tr>
-                        <tr class="q-total-row">
-                            <td colspan="3" style="text-align: right;">TOTAL</td>
-                            <td style="text-align: right; color: #0056b3;" id="qTotal">K 0.00</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <div style="font-size: 9.5px; margin-top: 10px; color: #444;">
-                    <strong>IMPORTANT NOTICE ON VEHICLE AVAILABILITY & PRICING:</strong><br>
-                    1. <strong>Stock Availability:</strong> This quotation is based on active Japanese auction/supplier listing. Live inventory updates continuously and is subject to prior sale.<br>
-                    2. <strong>Price & Spec Guarantee:</strong> The quoted price applies specifically to this exact vehicle. If this unit is sold before deposit, alternative options will be presented.<br>
-                    3. <strong>Quote Validity:</strong> This quotation is valid for 48 Hours from issue date.
-                </div>
-
-                <div class="bank-box">
-                    <strong>ALL PAYMENTS TO BE MADE TO EITHER OF THE FOLLOWING ACCOUNTS:</strong>
-                    <div class="bank-grid">
-                        <div>
-                            <strong>Account Name:</strong> Niugini Open Biz<br>
-                            <strong>Account #:</strong> 7019659379<br>
-                            <strong>BANK:</strong> BSP | <strong>Branch:</strong> Waigani Drive<br>
-                            <strong>BSB Code:</strong> 088-968
-                        </div>
-                        <div>
-                            <strong>Account Name:</strong> Niugini Open Biz<br>
-                            <strong>Account #:</strong> 27720114<br>
-                            <strong>BANK:</strong> KINA | <strong>Branch:</strong> Jacksons 7 Mile<br>
-                            <strong>BSB Code:</strong> 028-022
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ACTION BUTTON GROUP -->
-            <div class="action-btn-group">
-                <button class="btn-action btn-pdf" onclick="downloadOfficialPDF()">📥 Download Official Quote PDF</button>
-                <button class="btn-action btn-email" onclick="emailOfficialQuote()">✉️ Email Quote (CC sales@niuginibiz.com)</button>
-            </div>
+        
+        <!-- Divider -->
+        <div class="h-12 w-0.5 bg-slate-200 hidden sm:block"></div>
+        
+        <!-- Main Company Titles -->
+        <div class="flex flex-col">
+          <span class="text-2xl font-black tracking-tight text-slate-900 uppercase">
+            Niugini Open Biz
+          </span>
+          <span class="text-xs font-bold tracking-[0.25em] text-blue-600 uppercase mt-0.5">
+            NiuginiBiz Tech Consultancy
+          </span>
         </div>
+      </div>
 
-    </div>
-</div>
+      <!-- Quote Meta Details -->
+      <div class="text-left sm:text-right">
+        <span class="inline-block px-3 py-1 bg-blue-50 text-blue-700 text-xs font-bold rounded-full uppercase tracking-wider mb-2">
+          OFFICIAL QUOTATION
+        </span>
+        <p class="text-sm font-semibold text-slate-600">Quote #: <span class="text-slate-900">NOB-2026-001</span></p>
+        <p class="text-xs text-slate-500 mt-1">Date: August 12, 2026</p>
+      </div>
+    </header>
 
-<script>
-    let liveUsdToPgk = 4.10;
-    const txFeeBuffer = 1.03;
-    let calculatedTotal = 0;
-    let currentQuoteSeq = 1;
+    <!-- CLIENT & PROVIDER DETAILS -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 gap-8 my-8 text-sm">
+      <div>
+        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Prepared By</h3>
+        <p class="font-bold text-slate-800 text-base">Niugini Open Biz (NiuginiBiz)</p>
+        <p class="text-slate-600">ICT Infrastructure & Consultancy Services</p>
+        <p class="text-slate-600">Port Moresby, Papua New Guinea</p>
+        <p class="text-slate-600">Email: contact@niuginibiz.com</p>
+      </div>
+      <div>
+        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Prepared For</h3>
+        <p class="font-bold text-slate-800 text-base">Client Name / Organization</p>
+        <p class="text-slate-600">Department / Branch</p>
+        <p class="text-slate-600">Port Moresby, NCD</p>
+      </div>
+    </section>
 
-    async function fetchFxRate() {
-        try {
-            let response = await fetch('https://open.er-api.com/v6/latest/USD');
-            let data = await response.json();
-            if(data && data.rates && data.rates.PGK) {
-                liveUsdToPgk = data.rates.PGK * txFeeBuffer;
-                document.getElementById('rateStatus').innerText = `✅ Live Rate: $1 USD = K${liveUsdToPgk.toFixed(2)} PGK`;
-            }
-        } catch (e) {
-            document.getElementById('rateStatus').innerText = `⚠️ Standard Rate Applied: $1 USD = K${(liveUsdToPgk * txFeeBuffer).toFixed(2)} PGK`;
-        }
-    }
-    fetchFxRate();
+    <!-- ITEMS TABLE -->
+    <section class="my-8">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-slate-50 border-y border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
+            <th class="py-3 px-4">Description</th>
+            <th class="py-3 px-4 text-center">Qty</th>
+            <th class="py-3 px-4 text-right">Unit Price (PGK)</th>
+            <th class="py-3 px-4 text-right">Amount (PGK)</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 text-sm">
+          <tr>
+            <td class="py-4 px-4 font-medium text-slate-800">
+              Web Application Development & Task Logging Setup
+            </td>
+            <td class="py-4 px-4 text-center">1</td>
+            <td class="py-4 px-4 text-right">10,000.00</td>
+            <td class="py-4 px-4 text-right font-semibold">10,000.00</td>
+          </tr>
+          <tr>
+            <td class="py-4 px-4 font-medium text-slate-800">
+              Cloud Data Sync & Infrastructure Integration
+            </td>
+            <td class="py-4 px-4 text-center">1</td>
+            <td class="py-4 px-4 text-right">5,400.00</td>
+            <td class="py-4 px-4 text-right font-semibold">5,400.00</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
 
-    function calculateCost() {
-        const agentFeePGK = 1500;
-        const markupPGK = 10000;
+    <!-- TOTALS SECTION -->
+    <section class="flex flex-col sm:flex-row justify-end items-start border-t border-slate-100 pt-6 my-8">
+      <div class="w-full sm:w-1/2 space-y-3 text-sm">
+        <div class="flex justify-between text-slate-600">
+          <span>Subtotal</span>
+          <span class="font-semibold text-slate-800">K15,400.00</span>
+        </div>
+        <div class="flex justify-between text-slate-600">
+          <span>Tax / GST</span>
+          <span class="font-semibold text-slate-800">K0.00</span>
+        </div>
+        <div class="flex justify-between text-base font-black text-slate-900 border-t border-slate-200 pt-3">
+          <span>Total Investment</span>
+          <span class="text-blue-600">K15,400.00</span>
+        </div>
+      </div>
+    </section>
 
-        let cifUSD = parseFloat(document.getElementById('usdCif').value) || 0;
-        let dutyRate = parseFloat(document.getElementById('dutyRate').value);
-        let wharfagePGK = parseFloat(document.getElementById('portWharfage').value);
+    <!-- FOOTER -->
+    <footer class="mt-12 pt-6 border-t border-slate-100 text-center text-xs text-slate-400">
+      <p class="font-medium text-slate-500 mb-1">Thank you for choosing Niugini Open Biz.</p>
+      <p>This document was generated electronically. Valid without signature.</p>
+    </footer>
 
-        let cifPGK = cifUSD * liveUsdToPgk;
-        let dutyPGK = cifPGK * dutyRate;
-        let gstPGK = (cifPGK + dutyPGK) * 0.10;
+  </main>
 
-        calculatedTotal = cifPGK + dutyPGK + gstPGK + wharfagePGK + agentFeePGK + markupPGK;
-        let deposit60 = calculatedTotal * 0.60;
-
-        document.getElementById('totalPrice').innerText = 'K ' + Math.round(calculatedTotal).toLocaleString();
-        document.getElementById('depositPrice').innerText = '60% Pre-Order Deposit: K ' + Math.round(deposit60).toLocaleString();
-        document.getElementById('resultBox').style.display = 'block';
-    }
-
-    function openQuoteModal() {
-        document.getElementById('previewArea').style.display = 'none';
-        document.getElementById('quoteModal').style.display = 'flex';
-    }
-
-    function closeQuoteModal() {
-        document.getElementById('quoteModal').style.display = 'none';
-    }
-
-    function showQuotePreview() {
-        renderPDFData();
-        document.getElementById('previewArea').style.display = 'block';
-    }
-
-    function renderPDFData() {
-        let name = document.getElementById('custNameInput').value || 'Kilala Rabbie Benson';
-        let phone = document.getElementById('custPhoneInput').value || '+67570630933';
-        let email = document.getElementById('custEmailInput').value || 'kilalarabbieb@gmail.com';
-        let loc = document.getElementById('custLocationInput').value || 'KAVIENG, NIP';
-        let veh = document.getElementById('vehModelInput').value || 'NISSAN X-TRAIL T31 SUV (Japanese Used Vehicle)';
-        let stock = document.getElementById('stockRefInput').value || 'CE139082';
-
-        let portSelect = document.getElementById('portWharfage');
-        let portName = portSelect.options[portSelect.selectedIndex].text;
-
-        let deposit = calculatedTotal * 0.60;
-        let balance = calculatedTotal * 0.40;
-
-        document.getElementById('qCustName').innerText = name;
-        document.getElementById('qCustPhone').innerText = 'Ph. ' + phone;
-        document.getElementById('qCustEmail').innerText = 'Email: ' + email;
-        document.getElementById('qCustLocation').innerText = loc;
-        document.getElementById('qVehName').innerText = veh;
-        document.getElementById('qCode').innerText = stock;
-        document.getElementById('qPort').innerText = portName;
-        document.getElementById('qPort2').innerText = portName;
-
-        let formattedTotal = 'K ' + Math.round(calculatedTotal).toLocaleString() + '.00';
-        document.getElementById('qUnitPrice').innerText = formattedTotal;
-        document.getElementById('qLineAmount').innerText = formattedTotal;
-        document.getElementById('qTotal').innerText = formattedTotal;
-        document.getElementById('qDeposit').innerText = 'K' + Math.round(deposit).toLocaleString() + '.00';
-        document.getElementById('qBalance').innerText = 'K' + Math.round(balance).toLocaleString() + '.00';
-
-        let formattedSeq = String(currentQuoteSeq).padStart(3, '0');
-        let invNo = 'NBZ26PO' + formattedSeq;
-        document.getElementById('qInvNo').innerText = invNo;
-        
-        let today = new Date();
-        document.getElementById('qDate').innerText = today.getDate() + '-' + today.toLocaleString('default', { month: 'short' }) + '-' + today.getFullYear().toString().substr(-2);
-        
-        let validDate = new Date();
-        validDate.setDate(today.getDate() + 30);
-        document.getElementById('qValidDate').innerText = validDate.toLocaleString('default', { month: 'long' }) + ' ' + validDate.getDate() + ', ' + validDate.getFullYear();
-    }
-
-    // PDF RENDER FIX: CLONES TEMPLATE TO ROOT FOR FULL UNLIMITED HEIGHT RENDERING
-    function downloadOfficialPDF() {
-        let originalElement = document.getElementById('pdfTemplate');
-        let custName = document.getElementById('qCustName').innerText.replace(/\s+/g, '_');
-        let invNo = document.getElementById('qInvNo').innerText;
-
-        // Clone element to document body outside modal to avoid scroll truncation
-        let clone = originalElement.cloneNode(true);
-        clone.style.width = '750px';
-        clone.style.position = 'absolute';
-        clone.style.left = '-9999px';
-        clone.style.top = '0';
-        document.body.appendChild(clone);
-
-        let opt = {
-            margin:       [0.3, 0.3, 0.3, 0.3],
-            filename:     `Proforma_Invoice_${invNo}_${custName}.pdf`,
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true, logging: false },
-            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-        };
-
-        html2pdf().set(opt).from(clone).save().then(() => {
-            document.body.removeChild(clone);
+  <!-- JAVASCRIPT FOR IMAGE EXPORT -->
+  <script>
+    async function exportQuoteAsImage() {
+      const element = document.getElementById('quote-container');
+      
+      try {
+        // High quality rendering using html2canvas
+        const canvas = await html2canvas(element, {
+          scale: 2, // 2x resolution for high definition
+          useCORS: true,
+          backgroundColor: '#ffffff'
         });
+
+        // Convert canvas to base64 image link
+        const image = canvas.toDataURL('image/png', 1.0);
         
-        currentQuoteSeq++;
+        // Trigger automatic browser download
+        const downloadLink = document.createElement('a');
+        downloadLink.href = image;
+        downloadLink.download = 'Quote_NiuginiBiz.png';
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+      } catch (error) {
+        console.error('Error rendering image:', error);
+        alert('Failed to generate image. Please try again.');
+      }
     }
-
-    function emailOfficialQuote() {
-        let custEmail = document.getElementById('custEmailInput').value || 'kilalarabbieb@gmail.com';
-        let custName = document.getElementById('qCustName').innerText;
-        let invNo = document.getElementById('qInvNo').innerText;
-        let vehName = document.getElementById('qVehName').innerText;
-        let total = document.getElementById('qTotal').innerText;
-        let deposit = document.getElementById('qDeposit').innerText;
-        let balance = document.getElementById('qBalance').innerText;
-        let portName = document.getElementById('qPort').innerText;
-
-        let subject = encodeURIComponent(`Official Proforma Invoice ${invNo} - ${vehName} (${custName})`);
-        let cc = encodeURIComponent('sales@niuginibiz.com');
-        
-        let bodyText = `Dear ${custName},
-
-Thank you for choosing Niugini Open Biz for your vehicle import pre-order!
-
-Please find your Proforma Invoice summary details below:
-
-• Proforma Invoice #: ${invNo}
-• Vehicle: ${vehName}
-• Destination Port: ${portName}
-• Total Driveaway PGK Price: ${total}
-
-PAYMENT BREAKDOWN (2-STAGE STRUCTURE):
-1. 60% Pre-Order Deposit: ${deposit} (Required to confirm vehicle order)
-2. 40% Final Balance: ${balance} (Due 1 week prior to vessel arrival)
-
-BANK ACCOUNT DETAILS FOR DEPOSIT:
-BSP Bank | Acc Name: Niugini Open Biz | Acc #: 7019659379 | Branch: Waigani Drive
-KINA Bank | Acc Name: Niugini Open Biz | Acc #: 27720114 | Branch: Jacksons 7 Mile
-
-Kind regards,
-Sales Team
-Niugini Open Biz | Port Moresby, PNG
-Mobile: +675 7830 5513 / 7775 7633
-Email: sales@niuginibiz.com`;
-
-        let body = encodeURIComponent(bodyText);
-        window.location.href = `mailto:${custEmail}?cc=${cc}&subject=${subject}&body=${body}`;
-
-        currentQuoteSeq++;
-    }
-</script>
-
+  </script>
 </body>
 </html>
