@@ -111,7 +111,6 @@
             box-shadow: var(--shadow-sm);
         }
 
-        /* INSTRUCTION NOTE BOX */
         .instruction-box {
             background-color: #fffbeb;
             border: 1px solid #fde68a;
@@ -308,7 +307,7 @@
 
         /* PDF DOCUMENT SPECIFIC STYLES */
         #pdfTemplate {
-            padding: 30px; 
+            padding: 20px; 
             background: #ffffff; 
             color: #000; 
             font-size: 11px; 
@@ -351,6 +350,14 @@
         .btn-pdf:hover { background: var(--primary-dark); transform: translateY(-1px); }
         .btn-email { background: var(--success); box-shadow: 0 6px 16px rgba(16, 185, 129, 0.25); }
         .btn-email:hover { background: var(--success-hover); transform: translateY(-1px); }
+        
+        /* Fallback styling for logo text if image fails */
+        .logo-fallback {
+            font-size: 24px;
+            font-weight: 800;
+            color: #0284c7;
+            letter-spacing: -0.5px;
+        }
     </style>
 </head>
 <body>
@@ -360,13 +367,15 @@
     <!-- HEADER CARD -->
     <div class="card">
         <div class="header-logo-container">
-            <!-- HOSTED BRAND LOGO -->
-            <img src="http://www.niuginibiz.com/wp-content/uploads/2026/08/bizlogo.png" alt="Niugini Open Biz Logo" class="brand-logo-img">
+            <!-- HOSTED BRAND LOGO WITH FALLBACK -->
+            <img src="https://www.niuginibiz.com/wp-content/uploads/2026/08/bizlogo.png" 
+                 onerror="this.onerror=null; this.src='https://www.niuginibiz.com/wp-content/uploads/bizlogo.png'; this.alt='Niugini Open Biz';" 
+                 alt="Niugini Open Biz Logo" 
+                 class="brand-logo-img">
         </div>
         <p class="header-sub">Vehicle Import Pre-Order & Driveaway Cost Calculator</p>
         <div id="rateStatus" class="rate-badge">✅ Live Rate: $1 USD = K4.57 PGK</div>
 
-        <!-- INSTRUCTION NOTE BOX -->
         <div class="instruction-box">
             <h4>💡 How to Calculate Your Driveaway Price (3 Easy Steps):</h4>
             <ol>
@@ -459,7 +468,10 @@
                 <div class="q-header">
                     <div>
                         <div class="q-logo-wrap">
-                            <img src="http://www.niuginibiz.com/wp-content/uploads/2026/08/bizlogo.png" alt="Niugini Open Biz Logo" style="max-width: 170px; height: auto;">
+                            <img src="https://www.niuginibiz.com/wp-content/uploads/2026/08/bizlogo.png" 
+                                 onerror="this.onerror=null; this.src='https://www.niuginibiz.com/wp-content/uploads/bizlogo.png';" 
+                                 alt="Niugini Open Biz Logo" 
+                                 style="max-width: 170px; height: auto;">
                         </div>
                         <div>Section 42, Lot 95, Galo Place, Angau Drive</div>
                         <div>Boroko, Port Moresby NCD</div>
@@ -658,29 +670,19 @@
     }
 
     function downloadOfficialPDF() {
-        let originalElement = document.getElementById('pdfTemplate');
+        const element = document.getElementById('pdfTemplate');
         let custName = document.getElementById('qCustName').innerText.replace(/\s+/g, '_');
         let invNo = document.getElementById('qInvNo').innerText;
 
-        let clone = originalElement.cloneNode(true);
-        clone.style.width = '750px';
-        clone.style.position = 'absolute';
-        clone.style.left = '-9999px';
-        clone.style.top = '0';
-        document.body.appendChild(clone);
-
         let opt = {
-            margin:       [0.3, 0.3, 0.3, 0.3],
+            margin:       0.3,
             filename:     `Proforma_Invoice_${invNo}_${custName}.pdf`,
             image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true, logging: false },
+            html2canvas:  { scale: 2, useCORS: true, allowTaint: true, logging: false },
             jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
         };
 
-        html2pdf().set(opt).from(clone).save().then(() => {
-            document.body.removeChild(clone);
-        });
-        
+        html2pdf().set(opt).from(element).save();
         currentQuoteSeq++;
     }
 
