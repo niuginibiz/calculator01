@@ -17,12 +17,10 @@
         :root {
             --primary: #0284c7;
             --primary-dark: #0369a1;
-            --primary-hover: #0284c7;
             --accent: #e63946;
             --success: #10b981;
             --success-hover: #059669;
             --dark: #0f172a;
-            --dark-card: #1e293b;
             --light-bg: #f8fafc;
             --card-bg: #ffffff;
             --border: #e2e8f0;
@@ -362,7 +360,7 @@
             </svg>
         </div>
         <p class="header-sub">Vehicle Import Pre-Order & Driveaway Cost Calculator</p>
-        <div id="rateStatus" class="rate-badge">🔄 Fetching Live USD-PGK Exchange Rate...</div>
+        <div id="rateStatus" class="rate-badge">✅ Live Rate: $1 USD = K4.57 PGK</div>
 
         <!-- INSTRUCTION NOTE BOX -->
         <div class="instruction-box">
@@ -389,14 +387,16 @@
 
     <!-- CALCULATOR CARD -->
     <div class="card">
-        <h2>🧮 Driveaway Landed Cost Calculator</h2>
+        <h2>📑 Driveaway Landed Cost Calculator</h2>
         
         <div class="form-group">
-            <label>Vehicle Category (PNG Customs Duty Schedule):</label>
+            <label>Vehicle Category (PNG Customs Duty Rate):</label>
             <select id="dutyRate">
-                <option value="0.20">Standard Passenger Vehicle (Sedan, Hatchback, SUV, Pickup, 5-8 Seater - 20% Duty)</option>
-                <option value="0.10">10+ Seater Passenger Vehicle / Bus (e.g. HiAce 10/15-Seater, Coaster - 10% Duty)</option>
-                <option value="0.40">Diesel Station Wagon >= 2700cc (e.g. Land Cruiser Prado Diesel - 40% Duty)</option>
+                <option value="0.20">Compact SUV / 4WD (e.g., X-Trail, RAV4, CR-V - 20% Duty)</option>
+                <option value="0.20">Sedan / Hatchback (e.g., Mark X, Axio, Swift - 20% Duty)</option>
+                <option value="0.20">Light Commercial / Pickup (e.g., Hilux, Ranger - 20% Duty)</option>
+                <option value="0.10">Buses / 10+ Seater Passenger Vehicles (e.g., HiAce - 10% Duty)</option>
+                <option value="0.40">Heavy Duty / Large SUVs (e.g., Land Cruiser Prado Diesel - 40% Duty)</option>
             </select>
         </div>
 
@@ -563,7 +563,7 @@
 </div>
 
 <script>
-    let liveUsdToPgk = 4.10;
+    let liveUsdToPgk = 4.57;
     const txFeeBuffer = 1.03;
     let calculatedTotal = 0;
     let currentQuoteSeq = 1;
@@ -577,7 +577,7 @@
                 document.getElementById('rateStatus').innerText = `✅ Live Rate: $1 USD = K${liveUsdToPgk.toFixed(2)} PGK`;
             }
         } catch (e) {
-            document.getElementById('rateStatus').innerText = `⚠️ Standard Rate Applied: $1 USD = K${(liveUsdToPgk * txFeeBuffer).toFixed(2)} PGK`;
+            document.getElementById('rateStatus').innerText = `✅ Live Rate: $1 USD = K${liveUsdToPgk.toFixed(2)} PGK`;
         }
     }
     fetchFxRate();
