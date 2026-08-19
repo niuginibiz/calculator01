@@ -7,7 +7,7 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Inter Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- html2pdf.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
@@ -24,10 +24,10 @@
     <div class="max-w-6xl mx-auto space-y-6">
         
         <!-- Top Application Header -->
-        <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-800/80 backdrop-blur border border-slate-700/60 p-5 rounded-2xl shadow-xl">
-            <div class="flex items-center gap-4">
-                <div class="h-12 w-12 rounded-xl bg-slate-900 border border-slate-700 p-1 flex items-center justify-center shadow-md overflow-hidden shrink-0">
-                    <img src="http://www.niuginibiz.com/wp-content/uploads/2026/03/WhatsApp-Image-2024-02-11-at-11.30.23-AM-2024_11_07-04_46_09-UTC-modified.png" alt="Niugini Open Biz Logo" class="h-full w-full object-contain">
+        <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-800/80 backdrop-blur border border-slate-700/60 p-6 rounded-2xl shadow-xl">
+            <div class="flex items-center gap-3">
+                <div class="h-10 w-10 rounded-xl bg-blue-600 flex items-center justify-center font-bold text-lg text-white shadow-lg shadow-blue-500/30">
+                    NBZ
                 </div>
                 <div>
                     <h1 class="text-xl font-bold tracking-tight text-white">NIUGINI OPEN BIZ</h1>
@@ -156,18 +156,17 @@
                 <!-- Printable Invoice Document -->
                 <div id="proformaContainer" class="bg-white text-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl border border-slate-200">
                     
-                    <!-- Document Header with Logo -->
-                    <div class="flex flex-col sm:flex-row justify-between border-b border-slate-200 pb-6 mb-6 gap-4 items-start sm:items-center">
-                        <div class="flex items-center gap-3">
-                            <img src="http://www.niuginibiz.com/wp-content/uploads/2026/03/WhatsApp-Image-2024-02-11-at-11.30.23-AM-2024_11_07-04_46_09-UTC-modified.png" alt="Niugini Open Biz Logo" class="h-16 w-auto object-contain">
-                            <div>
-                                <h2 class="text-2xl font-black tracking-tight text-slate-900 leading-none">PROFORMA INVOICE</h2>
-                                <p class="text-xs font-semibold text-slate-400 mt-1">REF: NBZ-IMP-<span id="invoiceRef">0000</span></p>
+                    <!-- Document Header -->
+                    <div class="flex flex-col sm:flex-row justify-between border-b border-slate-200 pb-6 mb-6 gap-4">
+                        <div>
+                            <div class="inline-block bg-slate-900 text-white font-black text-xs px-2.5 py-1 rounded tracking-wider uppercase mb-2">
+                                NIUGINI OPEN BIZ
                             </div>
+                            <h2 class="text-2xl font-bold tracking-tight text-slate-900">PROFORMA INVOICE</h2>
+                            <p class="text-xs font-semibold text-slate-400 mt-0.5">REF: NBZ-IMP-<span id="invoiceRef">0000</span></p>
                         </div>
-                        <div class="sm:text-right text-xs space-y-0.5 text-slate-500">
+                        <div class="sm:text-right text-xs space-y-1 text-slate-500">
                             <p class="font-bold text-slate-800 text-sm">NBZ Tech Consultant</p>
-                            <p>Trading as Niugini Open Biz</p>
                             <p>Port Moresby, Papua New Guinea</p>
                             <p>Email: sales@niuginibiz.com</p>
                             <p class="pt-1 font-semibold text-slate-700">Date: <span id="currentDate"></span></p>
@@ -295,6 +294,7 @@
 
         // Custom Duty Logic (Broker Updated Rules)
         function getCustomsDutyRate(vehicleCategory, engineCC, fuelType, seatingCapacity) {
+            // Rule 1: 10 or more seats = 10% duty
             if (seatingCapacity >= 10) {
                 return {
                     rate: 0.10,
@@ -302,6 +302,7 @@
                 };
             }
             
+            // Rule 2: Station Wagon + Diesel + Engine >= 2700cc = 40% duty
             if (vehicleCategory === 'Station Wagon' && fuelType === 'Diesel' && engineCC >= 2700) {
                 return {
                     rate: 0.40,
@@ -309,6 +310,7 @@
                 };
             }
             
+            // Rule 3: All other vehicles = 20% duty
             return {
                 rate: 0.20,
                 explanation: "20% Duty applied: Standard vehicle classification."
@@ -316,6 +318,7 @@
         }
 
         function calculate() {
+            // Read Inputs
             const clientName = document.getElementById('clientName').value || 'Client';
             const vehicleDesc = document.getElementById('vehicleDesc').value || 'Vehicle';
             const seatingCapacity = parseInt(document.getElementById('seatingCapacity').value) || 0;
@@ -328,12 +331,15 @@
             const agentFeePgk = parseFloat(document.getElementById('agentFeePgk').value) || 0;
             const markupPgk = parseFloat(document.getElementById('markupPgk').value) || 0;
 
+            // Effective USD/PGK Rate with 3% buffer
             const effectiveRate = liveUsdPgkRate * 1.03;
             document.getElementById('effectiveRateDisplay').textContent = effectiveRate.toFixed(4);
 
+            // Determine Duty Rate
             const dutyInfo = getCustomsDutyRate(vehicleCategory, engineCC, fuelType, seatingCapacity);
             document.getElementById('dutyRuleExplanation').textContent = dutyInfo.explanation;
 
+            // Financial Calculations
             const cifPgk = cifUsd * effectiveRate;
             const dutyPgk = cifPgk * dutyInfo.rate;
             const gstPgk = (cifPgk + dutyPgk) * 0.10;
@@ -342,6 +348,7 @@
             const deposit60 = totalDriveaway * 0.60;
             const balance40 = totalDriveaway * 0.40;
 
+            // Update UI Invoice Document
             document.getElementById('outClient').textContent = clientName;
             document.getElementById('outVehicle').textContent = vehicleDesc;
             document.getElementById('outSpecs').textContent = `${engineCC}cc ${fuelType} | ${seatingCapacity} Seats (${vehicleCategory})`;
@@ -358,6 +365,7 @@
             document.getElementById('outDeposit').textContent = 'K' + Math.round(deposit60).toLocaleString('en-US');
             document.getElementById('outBalance').textContent = 'K' + Math.round(balance40).toLocaleString('en-US');
 
+            // Build Mailto Link
             const emailSubject = encodeURIComponent(`Vehicle Import Quotation: ${vehicleDesc} - ${clientName}`);
             const emailBody = encodeURIComponent(
                 `Dear ${clientName},\n\n` +
@@ -376,6 +384,7 @@
             document.getElementById('emailBtn').href = `mailto:?cc=sales@niuginibiz.com&subject=${emailSubject}&body=${emailBody}`;
         }
 
+        // Bind Live Input Listeners
         const inputs = ['clientName', 'vehicleDesc', 'seatingCapacity', 'vehicleCategory', 'engineCC', 'fuelType', 'cifUsd', 'wharfagePgk', 'agentFeePgk', 'markupPgk'];
         inputs.forEach(id => {
             const el = document.getElementById(id);
@@ -383,10 +392,12 @@
             el.addEventListener('change', calculate);
         });
 
+        // PDF Generation via Clean DOM Cloning
         function downloadPDF() {
             const element = document.getElementById('proformaContainer');
             const clone = element.cloneNode(true);
             
+            // Apply subtle print optimization styles to clone
             clone.style.padding = '30px';
             clone.style.boxShadow = 'none';
             clone.style.border = 'none';
@@ -395,13 +406,14 @@
                 margin:       8,
                 filename:     `Proforma_${document.getElementById('clientName').value.replace(/\s+/g, '_')}_NBZ.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, logging: false, useCORS: true },
+                html2canvas:  { scale: 2, logging: false },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
             html2pdf().set(opt).from(clone).save();
         }
 
+        // Initialize App
         fetchExchangeRate();
     </script>
 </body>
