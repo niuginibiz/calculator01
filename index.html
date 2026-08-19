@@ -307,7 +307,7 @@
 
         /* PDF DOCUMENT SPECIFIC STYLES */
         #pdfTemplate {
-            padding: 20px; 
+            padding: 24px; 
             background: #ffffff; 
             color: #000; 
             font-size: 11px; 
@@ -350,14 +350,6 @@
         .btn-pdf:hover { background: var(--primary-dark); transform: translateY(-1px); }
         .btn-email { background: var(--success); box-shadow: 0 6px 16px rgba(16, 185, 129, 0.25); }
         .btn-email:hover { background: var(--success-hover); transform: translateY(-1px); }
-        
-        /* Fallback styling for logo text if image fails */
-        .logo-fallback {
-            font-size: 24px;
-            font-weight: 800;
-            color: #0284c7;
-            letter-spacing: -0.5px;
-        }
     </style>
 </head>
 <body>
@@ -367,7 +359,6 @@
     <!-- HEADER CARD -->
     <div class="card">
         <div class="header-logo-container">
-            <!-- HOSTED BRAND LOGO WITH FALLBACK -->
             <img src="https://www.niuginibiz.com/wp-content/uploads/2026/08/bizlogo.png" 
                  onerror="this.onerror=null; this.src='https://www.niuginibiz.com/wp-content/uploads/bizlogo.png'; this.alt='Niugini Open Biz';" 
                  alt="Niugini Open Biz Logo" 
@@ -452,7 +443,7 @@
         
         <h3>📝 Enter Customer Details for Official Quote</h3>
         <div class="form-grid">
-            <input type="text" id="custNameInput" placeholder="Customer Full Name (e.g. Kilala Rabbie Benson)">
+            <input type="text" id="custNameInput" placeholder="Customer Full Name (e.g. Joe Paul)">
             <input type="text" id="custPhoneInput" placeholder="Phone Number (e.g. +675 70630933)">
             <input type="email" id="custEmailInput" placeholder="Customer Email">
             <input type="text" id="custLocationInput" placeholder="Town / Province (e.g. KAVIENG, NIP)">
@@ -468,10 +459,8 @@
                 <div class="q-header">
                     <div>
                         <div class="q-logo-wrap">
-                            <img src="https://www.niuginibiz.com/wp-content/uploads/2026/08/bizlogo.png" 
-                                 onerror="this.onerror=null; this.src='https://www.niuginibiz.com/wp-content/uploads/bizlogo.png';" 
-                                 alt="Niugini Open Biz Logo" 
-                                 style="max-width: 170px; height: auto;">
+                            <!-- EMBEDDED BASE64 LOGO TO PREVENT CORS BLANK ISSUES -->
+                            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='50' viewBox='0 0 200 50'><rect width='200' height='50' fill='%230284c7' rx='6'/><text x='100' y='30' fill='%23ffffff' font-family='Arial' font-size='16' font-weight='bold' text-anchor='middle'>Niugini Open Biz</text></svg>" alt="Niugini Open Biz Logo" style="max-width: 170px; height: auto;">
                         </div>
                         <div>Section 42, Lot 95, Galo Place, Angau Drive</div>
                         <div>Boroko, Port Moresby NCD</div>
@@ -479,12 +468,12 @@
                         <div>sales@niuginibiz.com</div>
                     </div>
                     <div style="text-align: right;">
-                        <h2 style="margin: 0; color: #0284c7;">Quote</h2>
-                        <div><strong>DATE:</strong> <span id="qDate">12-Aug-26</span></div>
+                        <h2 style="margin: 0; color: #0284c7; font-size: 24px;">Quote</h2>
+                        <div><strong>DATE:</strong> <span id="qDate">20-Aug-26</span></div>
                         <div><strong>Proforma Inv #:</strong> <span id="qInvNo">NBZ26PO001</span></div>
                         <div><strong>Customer ID:</strong> Cash Sales</div>
                         <div style="margin-top: 8px;"><strong>Quotation valid until:</strong></div>
-                        <div id="qValidDate">September 12, 2026</div>
+                        <div id="qValidDate">September 20, 2026</div>
                         <div><strong>Prepared by:</strong> Sales</div>
                     </div>
                 </div>
@@ -492,10 +481,10 @@
                 <div class="q-billing-grid">
                     <div>
                         <strong>Bill To:</strong><br>
-                        <span id="qCustName">Kilala Rabbie Benson</span><br>
+                        <span id="qCustName">Joe Paul</span><br>
                         <span id="qCustLocation">KAVIENG, NIP</span><br>
                         <span id="qCustPhone">Ph. +67570630933</span><br>
-                        <span id="qCustEmail">Email: kilalarabbieb@gmail.com</span>
+                        <span id="qCustEmail">Email: joepaul@gmail.com</span>
                     </div>
                 </div>
 
@@ -628,9 +617,9 @@
     }
 
     function renderPDFData() {
-        let name = document.getElementById('custNameInput').value || 'Kilala Rabbie Benson';
+        let name = document.getElementById('custNameInput').value || 'Joe Paul';
         let phone = document.getElementById('custPhoneInput').value || '+67570630933';
-        let email = document.getElementById('custEmailInput').value || 'kilalarabbieb@gmail.com';
+        let email = document.getElementById('custEmailInput').value || 'joepaul@gmail.com';
         let loc = document.getElementById('custLocationInput').value || 'KAVIENG, NIP';
         let veh = document.getElementById('vehModelInput').value || 'NISSAN X-TRAIL T31 SUV (Japanese Used Vehicle)';
         let stock = document.getElementById('stockRefInput').value || 'CE139082';
@@ -670,24 +659,40 @@
     }
 
     function downloadOfficialPDF() {
-        const element = document.getElementById('pdfTemplate');
+        const sourceElement = document.getElementById('pdfTemplate');
         let custName = document.getElementById('qCustName').innerText.replace(/\s+/g, '_');
         let invNo = document.getElementById('qInvNo').innerText;
 
+        // CLONE TEMPLATE TO ISOLATE FROM MODAL SCROLL POSITION & CAPTURE FULL CONTENTS
+        let pdfContainer = document.createElement('div');
+        pdfContainer.style.position = 'fixed';
+        pdfContainer.style.top = '0';
+        pdfContainer.style.left = '0';
+        pdfContainer.style.width = '750px';
+        pdfContainer.style.zIndex = '-9999';
+        pdfContainer.style.background = '#ffffff';
+
+        let clone = sourceElement.cloneNode(true);
+        pdfContainer.appendChild(clone);
+        document.body.appendChild(pdfContainer);
+
         let opt = {
-            margin:       0.3,
+            margin:       [0.3, 0.3, 0.3, 0.3],
             filename:     `Proforma_Invoice_${invNo}_${custName}.pdf`,
             image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true, allowTaint: true, logging: false },
+            html2canvas:  { scale: 2, useCORS: true, logging: false, scrollY: 0, scrollX: 0 },
             jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
         };
 
-        html2pdf().set(opt).from(element).save();
+        html2pdf().set(opt).from(clone).save().then(() => {
+            document.body.removeChild(pdfContainer);
+        });
+
         currentQuoteSeq++;
     }
 
     function emailOfficialQuote() {
-        let custEmail = document.getElementById('custEmailInput').value || 'kilalarabbieb@gmail.com';
+        let custEmail = document.getElementById('custEmailInput').value || 'joepaul@gmail.com';
         let custName = document.getElementById('qCustName').innerText;
         let invNo = document.getElementById('qInvNo').innerText;
         let vehName = document.getElementById('qVehName').innerText;
