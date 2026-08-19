@@ -5,62 +5,319 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Niugini Open Biz | PNG Vehicle Landed Cost Calculator</title>
     
+    <!-- PDF Generation Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        :root { 
-            --primary: #0284c7; 
-            --primary-dark: #0369a1; 
-            --success: #10b981; 
-            --success-hover: #059669; 
-            --whatsapp: #25D366; 
-            --whatsapp-hover: #128C7E; 
-            --dark: #0f172a; 
-            --card-bg: #ffffff; 
-            --border: #e2e8f0; 
-            --text-main: #334155; 
-            --text-muted: #64748b; 
-            --radius-lg: 20px; 
-            --radius-md: 12px; 
+        :root {
+            --primary: #0284c7;
+            --primary-dark: #0369a1;
+            --accent: #ef4444;
+            --success: #10b981;
+            --success-hover: #059669;
+            --whatsapp: #25D366;
+            --whatsapp-hover: #128C7E;
+            --dark: #0f172a;
+            --light-bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.02);
+            --shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 8px 10px -6px rgba(15, 23, 42, 0.02);
+            --shadow-lg: 0 25px 50px -12px rgba(15, 23, 42, 0.15);
         }
 
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); 
-            color: var(--text-main); 
-            margin: 0; 
-            padding: 40px 16px; 
-            min-height: 100vh; 
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 16px;
+            min-height: 100vh;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
         }
 
-        .container { max-width: 760px; margin: 0 auto; }
-        .card { background: var(--card-bg); border-radius: var(--radius-lg); padding: 36px; box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05); margin-bottom: 28px; }
-        .header-logo-container { text-align: center; margin-bottom: 20px; }
-        .brand-logo-img { max-width: 220px; height: auto; display: inline-block; }
-        h1, h2, h3 { color: var(--dark); margin-top: 0; font-weight: 800; }
-        h2 { font-size: 1.35rem; margin-bottom: 22px; }
+        .container {
+            max-width: 760px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: 36px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+        }
+
+        .header-logo-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .brand-logo-img {
+            max-width: 220px;
+            height: auto;
+            display: inline-block;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.05));
+            transition: transform 0.3s ease;
+        }
+
+        .brand-logo-img:hover {
+            transform: scale(1.02);
+        }
+
+        h1, h2, h3 { 
+            color: var(--dark); 
+            margin-top: 0; 
+            font-weight: 800;
+            letter-spacing: -0.025em;
+        }
+        
+        h2 { font-size: 1.35rem; margin-bottom: 22px; display: flex; align-items: center; gap: 10px; }
         h3 { font-size: 1.05rem; margin-bottom: 14px; }
-        .header-sub { text-align: center; font-size: 15px; color: var(--text-muted); margin-bottom: 24px; font-weight: 600; }
-        .rate-badge { font-size: 13.5px; color: #065f46; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 12px 20px; border-radius: 9999px; margin-bottom: 28px; text-align: center; font-weight: 700; }
-        .instruction-box { background-color: #fffbeb; border-left: 5px solid #f59e0b; padding: 20px 22px; border-radius: var(--radius-md); margin-bottom: 28px; font-size: 14px; color: #78350f; }
-        .model-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-top: 14px; }
-        .btn-model { display: flex; align-items: center; justify-content: center; background: #f8fafc; border: 1.5px solid var(--border); padding: 12px 14px; border-radius: var(--radius-md); text-decoration: none; color: var(--dark); font-weight: 700; font-size: 13px; }
+
+        .header-sub { 
+            text-align: center; 
+            font-size: 15px; 
+            color: var(--text-muted); 
+            margin-bottom: 24px; 
+            font-weight: 600; 
+        }
+
+        .rate-badge {
+            font-size: 13.5px; 
+            color: #065f46; 
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0; 
+            padding: 12px 20px; 
+            border-radius: 9999px;
+            margin-bottom: 28px; 
+            text-align: center; 
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .instruction-box {
+            background-color: #fffbeb;
+            border: 1px solid #fde68a;
+            border-left: 5px solid #f59e0b;
+            padding: 20px 22px;
+            border-radius: var(--radius-md);
+            margin-bottom: 28px;
+            font-size: 14px;
+            color: #78350f;
+        }
+
+        .instruction-box h4 {
+            margin: 0 0 10px 0;
+            color: #b45309;
+            font-size: 15px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .instruction-box ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .instruction-box li {
+            margin-bottom: 6px;
+        }
+
+        .model-grid {
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px; 
+            margin-top: 14px;
+        }
+
+        .btn-model {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            border: 1.5px solid var(--border); 
+            padding: 12px 14px; 
+            border-radius: var(--radius-md);
+            text-decoration: none; 
+            color: var(--dark); 
+            font-weight: 700; 
+            font-size: 13px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-model:hover { 
+            background: var(--primary); 
+            color: #ffffff; 
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(2, 132, 199, 0.25);
+        }
+
         .form-group { margin-bottom: 22px; }
-        label { display: block; font-weight: 700; margin-bottom: 8px; font-size: 12.5px; color: var(--text-muted); text-transform: uppercase; }
-        select, input { width: 100%; padding: 15px 18px; border: 1.5px solid var(--border); border-radius: var(--radius-md); font-size: 15px; box-sizing: border-box; background: #f8fafc; font-weight: 600; }
-        .btn-calc { width: 100%; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: #ffffff; font-weight: 800; padding: 18px; border: none; border-radius: var(--radius-md); cursor: pointer; font-size: 16px; }
-        .result-box { margin-top: 28px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 1px solid #bae6fd; padding: 28px; border-radius: var(--radius-lg); display: none; }
-        .price-title { font-size: 12px; text-transform: uppercase; color: var(--text-muted); font-weight: 800; }
-        .price-value { font-size: 40px; font-weight: 800; color: var(--primary-dark); margin: 6px 0; }
+        
+        label { 
+            display: block; 
+            font-weight: 700; 
+            margin-bottom: 8px; 
+            font-size: 12.5px; 
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        select, input {
+            width: 100%; 
+            padding: 15px 18px; 
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-md); 
+            font-size: 15px; 
+            font-family: inherit;
+            box-sizing: border-box; 
+            background: #f8fafc;
+            color: var(--dark);
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.12);
+        }
+
+        .btn-calc {
+            width: 100%; 
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); 
+            color: #ffffff; 
+            font-weight: 800;
+            padding: 18px; 
+            border: none; 
+            border-radius: var(--radius-md); 
+            cursor: pointer; 
+            font-size: 16px;
+            letter-spacing: 0.01em;
+            box-shadow: 0 8px 20px rgba(2, 132, 199, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .btn-calc:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(2, 132, 199, 0.4);
+        }
+
+        .result-box {
+            margin-top: 28px; 
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); 
+            border: 1px solid #bae6fd;
+            padding: 28px; 
+            border-radius: var(--radius-lg); 
+            display: none;
+            animation: slideUp 0.35s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .price-title { font-size: 12px; text-transform: uppercase; color: var(--text-muted); font-weight: 800; letter-spacing: 0.05em; }
+        .price-value { font-size: 40px; font-weight: 800; color: var(--primary-dark); margin: 6px 0; letter-spacing: -0.03em; }
         .deposit-value { font-size: 16px; font-weight: 700; color: var(--success); margin-bottom: 22px; }
-        .btn-quote { display: block; width: 100%; text-align: center; background: linear-gradient(135deg, var(--success) 0%, var(--success-hover) 100%); color: #ffffff; font-weight: 800; padding: 18px; border: none; border-radius: var(--radius-md); font-size: 16px; cursor: pointer; }
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.75); z-index: 1000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
-        .modal-card { background: #fff; max-width: 840px; width: 100%; max-height: 90vh; overflow-y: auto; border-radius: var(--radius-lg); padding: 36px; position: relative; }
-        .close-modal { position: absolute; top: 22px; right: 26px; font-size: 28px; cursor: pointer; color: var(--text-muted); }
-        #pdfTemplate { padding: 24px; background: #ffffff; color: #000; font-size: 11px; font-family: Arial, sans-serif; box-sizing: border-box; width: 100%; }
+
+        .btn-quote {
+            display: block; 
+            width: 100%; 
+            text-align: center; 
+            background: linear-gradient(135deg, var(--success) 0%, var(--success-hover) 100%);
+            color: #ffffff; 
+            font-weight: 800; 
+            padding: 18px; 
+            border: none;
+            border-radius: var(--radius-md); 
+            font-size: 16px; 
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+            transition: all 0.2s ease;
+        }
+        
+        .btn-quote:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%;
+            background: rgba(15, 23, 42, 0.75); 
+            backdrop-filter: blur(6px);
+            z-index: 1000; 
+            justify-content: center;
+            align-items: center; 
+            padding: 20px; 
+            box-sizing: border-box;
+        }
+
+        .modal-card {
+            background: #fff; 
+            max-width: 840px; 
+            width: 100%; 
+            max-height: 90vh;
+            overflow-y: auto; 
+            border-radius: var(--radius-lg); 
+            padding: 36px; 
+            position: relative;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .close-modal { 
+            position: absolute; 
+            top: 22px; 
+            right: 26px; 
+            font-size: 28px; 
+            cursor: pointer; 
+            color: var(--text-muted); 
+            transition: color 0.2s ease;
+        }
+
+        .close-modal:hover { color: var(--dark); }
+
+        /* PDF DOCUMENT SPECIFIC STYLES */
+        #pdfTemplate {
+            padding: 24px; 
+            background: #ffffff; 
+            color: #000; 
+            font-size: 11px; 
+            font-family: Arial, sans-serif;
+            box-sizing: border-box; 
+            width: 100%;
+        }
+
         .q-header { display: flex; justify-content: space-between; border-bottom: 2px solid #222; padding-bottom: 12px; }
         .q-logo-wrap { max-width: 200px; margin-bottom: 8px; }
         .q-billing-grid { display: flex; justify-content: space-between; margin: 18px 0; }
@@ -70,49 +327,99 @@
         .q-total-row { font-size: 13px; font-weight: bold; background: #f8fafc; }
         .bank-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; margin-top: 18px; font-size: 10.5px; border-radius: 6px; }
         .bank-grid { display: flex; justify-content: space-between; margin-top: 6px; }
+
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 22px; }
-        .action-btn-group { display: flex; gap: 14px; margin-top: 24px; flex-wrap: wrap; }
-        .btn-action { flex: 1; min-width: 200px; padding: 16px; border: none; border-radius: var(--radius-md); font-weight: 800; cursor: pointer; font-size: 15px; text-align: center; color: #fff; }
-        .btn-pdf { background: var(--primary); }
-        .btn-whatsapp { background: var(--whatsapp); }
+        
+        .action-btn-group {
+            display: flex; gap: 14px; margin-top: 24px; flex-wrap: wrap;
+        }
+
+        .btn-action {
+            flex: 1; 
+            min-width: 200px; 
+            padding: 16px; 
+            border: none; 
+            border-radius: var(--radius-md);
+            font-weight: 800; 
+            cursor: pointer; 
+            font-size: 15px; 
+            text-align: center; 
+            color: #fff;
+            transition: all 0.2s ease;
+        }
+
+        .btn-pdf { background: var(--primary); box-shadow: 0 6px 16px rgba(2, 132, 199, 0.25); }
+        .btn-pdf:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        .btn-whatsapp { background: var(--whatsapp); box-shadow: 0 6px 16px rgba(37, 211, 102, 0.25); }
+        .btn-whatsapp:hover { background: var(--whatsapp-hover); transform: translateY(-1px); }
     </style>
 </head>
 <body>
 
 <div class="container">
+
+    <!-- HEADER CARD -->
     <div class="card">
         <div class="header-logo-container">
+            <!-- EMBEDDED LOGO (GUARANTEED TO DISPLAY ON ALL CALCULATORS/BROWSERS) -->
             <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='55' viewBox='0 0 220 55'><rect width='220' height='55' fill='%230284c7' rx='8'/><text x='110' y='34' fill='%23ffffff' font-family='Arial, sans-serif' font-size='18' font-weight='bold' text-anchor='middle'>Niugini Open Biz</text></svg>" alt="Niugini Open Biz Logo" class="brand-logo-img">
         </div>
         <p class="header-sub">Vehicle Import Pre-Order & Driveaway Cost Calculator</p>
         <div id="rateStatus" class="rate-badge">✅ Live Rate: $1 USD = K4.57 PGK</div>
 
         <div class="instruction-box">
-            <h4>💡 How to Calculate Your Driveaway Price:</h4>
+            <h4>💡 How to Calculate Your Driveaway Price (3 Easy Steps):</h4>
             <ol>
-                <li>Click a PNG Top Seller model to search live stock on Be Forward.</li>
-                <li>Select <strong>Papua New Guinea + Your Port</strong> to get the CIF Price (USD).</li>
-                <li>Enter the CIF USD Price into the calculator below.</li>
+                <li>Click any PNG Top Seller model button below to search live stock on Be Forward.</li>
+                <li>On the vehicle page, select <strong>Papua New Guinea + Your Destination Port</strong> to get the total CIF Price (USD).</li>
+                <li>Enter the CIF USD Price into the calculator below to get your complete Landed Driveaway PGK Price!</li>
             </ol>
         </div>
 
+        <h3>🚗 PNG's Top Imported Models (Browse Live Stock):</h3>
+        <div class="model-grid">
+            <a href="https://www.beforward.jp/stocklist/make=1/model=212/sortkey=a?refer_bfs=875341" target="_blank" class="btn-model">Toyota Mark X</a>
+            <a href="https://www.beforward.jp/stocklist/make=3/model=473/sortkey=a?refer_bfs=875341" target="_blank" class="btn-model">Nissan X-Trail</a>
+            <a href="https://www.beforward.jp/stocklist/make=1/model=207/sortkey=a?refer_bfs=875341" target="_blank" class="btn-model">Toyota Mark II</a>
+            <a href="https://www.beforward.jp/stocklist/make=4/model=13365/sortkey=a?refer_bfs=875341" target="_blank" class="btn-model">Mazda CX-5</a>
+            <a href="https://www.beforward.jp/stocklist/make=1/model=181/sortkey=a?refer_bfs=875341" target="_blank" class="btn-model">Toyota Harrier</a>
+            <a href="https://www.beforward.jp/stocklist/make=4/model=475/sortkey=a?refer_bfs=875341" target="_blank" class="btn-model">Mazda Atenza</a>
+            <a href="https://www.beforward.jp/stocklist/make=1/model=151/sortkey=a?refer_bfs=875341" target="_blank" class="btn-model">Toyota Crown</a>
+            <a href="https://www.beforward.jp/stocklist/make=3/model=364/sortkey=a?refer_bfs=875341" target="_blank" class="btn-model">Nissan Sylphy</a>
+        </div>
+    </div>
+
+    <!-- CALCULATOR CARD -->
+    <div class="card">
+        <h2>📊 Driveaway Landed Cost Calculator</h2>
+        
         <div class="form-group">
             <label>Vehicle Category:</label>
             <select id="dutyRate">
-                <option value="0.20">Compact SUV / 4WD / Sedan / Hatchback</option>
-                <option value="0.10">Buses / 10+ Seater Passenger Vehicles</option>
-                <option value="0.40">Heavy Duty / Large SUVs (e.g., Land Cruiser)</option>
+                <option value="0.20">Compact SUV / 4WD (e.g., X-Trail, RAV4, CR-V)</option>
+                <option value="0.20">Sedan / Hatchback (e.g., Mark X, Axio, Swift)</option>
+                <option value="0.20">Light Commercial / Pickup (e.g., Hilux, Ranger)</option>
+                <option value="0.10">Buses / 10+ Seater Passenger Vehicles (e.g., HiAce)</option>
+                <option value="0.40">Heavy Duty / Large SUVs (e.g., Land Cruiser Prado Diesel)</option>
             </select>
         </div>
+
         <div class="form-group">
             <label>Be Forward Total CIF Price (USD $):</label>
             <input type="number" id="usdCif" placeholder="e.g. 5113" value="5113">
         </div>
+
         <div class="form-group">
             <label>Destination Port in PNG:</label>
             <select id="portWharfage">
-                <option value="1950" selected>PORT MORESBY / LAE Port</option>
-                <option value="2500">MADANG / KIMBE / WEWAK / KAVIENG / RABAUL Port</option>
+                <option value="1950">LAE Port</option>
+                <option value="1950" selected>PORT MORESBY Port</option>
+                <option value="2500">MADANG Port</option>
+                <option value="2500">KIMBE Port</option>
+                <option value="2500">WEWAK Port</option>
+                <option value="2500">KAVIENG Port</option>
+                <option value="2500">RABAUL Port</option>
+                <option value="2500">ORO BAY Port</option>
             </select>
         </div>
 
@@ -122,33 +429,37 @@
             <div class="price-title">Total Driveaway Price (PGK):</div>
             <div class="price-value" id="totalPrice">K0.00</div>
             <div class="deposit-value" id="depositPrice">60% Pre-Order Deposit: K0.00</div>
+            
             <button class="btn-quote" onclick="openQuoteModal()">📄 Generate Official Proforma Quotation</button>
         </div>
     </div>
+
 </div>
 
+<!-- OFFICIAL QUOTE GENERATOR MODAL -->
 <div id="quoteModal" class="modal-overlay">
     <div class="modal-card">
         <span class="close-modal" onclick="closeQuoteModal()">&times;</span>
         
-        <h3>📝 Enter Customer Details</h3>
+        <h3>📝 Enter Customer Details for Official Quote</h3>
         <div class="form-grid">
-            <input type="text" id="custNameInput" placeholder="Customer Full Name (e.g. James Paol)">
-            <input type="text" id="custPhoneInput" placeholder="Phone Number">
+            <input type="text" id="custNameInput" placeholder="Customer Full Name (e.g. Joe Paul)">
+            <input type="text" id="custPhoneInput" placeholder="Phone Number (e.g. +675 78305513)">
             <input type="email" id="custEmailInput" placeholder="Customer Email">
-            <input type="text" id="custLocationInput" placeholder="Town / Province">
-            <input type="text" id="vehModelInput" placeholder="Vehicle Name">
-            <input type="text" id="stockRefInput" placeholder="Be Forward Stock Code">
+            <input type="text" id="custLocationInput" placeholder="Town / Province (e.g. KAVIENG, NIP)">
+            <input type="text" id="vehModelInput" placeholder="Vehicle Name (e.g. NISSAN X-TRAIL T31 SUV)">
+            <input type="text" id="stockRefInput" placeholder="Be Forward Stock Code (e.g. CE139082)">
         </div>
 
         <button class="btn-calc" style="margin-bottom: 20px;" onclick="showQuotePreview()">Preview Quotation</button>
 
+        <!-- PRINTABLE FORMAL QUOTE TEMPLATE -->
         <div id="previewArea" style="display: none;">
             <div id="pdfTemplate">
                 <div class="q-header">
                     <div>
                         <div class="q-logo-wrap">
-                            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='50' viewBox='0 0 200 50'><rect width='200' height='50' fill='%230284c7' rx='6'/><text x='100' y='30' fill='%23ffffff' font-family='Arial' font-size='16' font-weight='bold' text-anchor='middle'>Niugini Open Biz</text></svg>">
+                            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='50' viewBox='0 0 200 50'><rect width='200' height='50' fill='%230284c7' rx='6'/><text x='100' y='30' fill='%23ffffff' font-family='Arial' font-size='16' font-weight='bold' text-anchor='middle'>Niugini Open Biz</text></svg>" alt="Niugini Open Biz Logo" style="max-width: 170px; height: auto;">
                         </div>
                         <div>Section 42, Lot 95, Galo Place, Angau Drive</div>
                         <div>Boroko, Port Moresby NCD</div>
@@ -158,20 +469,21 @@
                     <div style="text-align: right;">
                         <h2 style="margin: 0; color: #0284c7; font-size: 24px;">Quote</h2>
                         <div><strong>DATE:</strong> <span id="qDate">20-Aug-26</span></div>
-                        <div><strong>Quote No.:</strong> <span id="qInvNo">NBZ26PO-20Aug26-JamesPaol</span></div>
+                        <div><strong>Proforma Inv #:</strong> <span id="qInvNo">NBZ26PO001</span></div>
                         <div><strong>Customer ID:</strong> Cash Sales</div>
                         <div style="margin-top: 8px;"><strong>Quotation valid until:</strong></div>
                         <div id="qValidDate">September 20, 2026</div>
+                        <div><strong>Prepared by:</strong> Sales</div>
                     </div>
                 </div>
 
                 <div class="q-billing-grid">
                     <div>
                         <strong>Bill To:</strong><br>
-                        <span id="qCustName">James Paol</span><br>
-                        <span id="qCustLocation">Kokopo</span><br>
+                        <span id="qCustName">Joe Paul</span><br>
+                        <span id="qCustLocation">KAVIENG, NIP</span><br>
                         <span id="qCustPhone">Ph. +67578305513</span><br>
-                        <span id="qCustEmail">Email: pao@gmail.com</span>
+                        <span id="qCustEmail">Email: joepaul@gmail.com</span>
                     </div>
                 </div>
 
@@ -187,13 +499,20 @@
                     <tbody>
                         <tr>
                             <td>
-                                <strong id="qVehName">Vehicle Name</strong><br>
+                                <strong id="qVehName">NISSAN X-TRAIL T31 SUV (Japanese Used Vehicle)</strong><br>
                                 All-Inclusive Pre-Order & Landed Package<br><br>
                                 <strong>VEHICLE SPECIFICATIONS:</strong><br>
-                                Code / Stock Ref: <span id="qCode">CODE123</span><br><br>
+                                Code / Stock Ref: <span id="qCode">CE139082</span><br><br>
+                                <strong>PACKAGE INCLUDES:</strong><br>
+                                • Vehicle Purchase & Pre-Shipment Inspection in Japan<br>
+                                • International RORO Ocean Freight to <span id="qPort">Port</span><br>
+                                • All PNG Customs Duties, Import Taxes (GST), & Port Handling Charges<br>
+                                • End-to-End Customs Clearance & Handover at <span id="qPort2">Port</span><br><br>
                                 <strong>PAYMENT TERMS (2-STAGE STRUCTURE):</strong><br>
-                                • <strong>60% Initial Deposit:</strong> <span id="qDeposit">K0.00</span><br>
-                                • <strong>40% Final Balance:</strong> <span id="qBalance">K0.00</span>
+                                • <strong>60% Initial Deposit Required Upon Order Confirmation:</strong> <span id="qDeposit">K0.00</span><br>
+                                • <strong>40% Final Balance Due 1 Week Prior to Vessel Arrival:</strong> <span id="qBalance">K0.00</span><br><br>
+                                <strong>ESTIMATED DELIVERY TIMELINE:</strong><br>
+                                • ~8 Weeks from deposit confirmation to port arrival.
                             </td>
                             <td>1</td>
                             <td style="text-align: right;" id="qUnitPrice">K 0.00</td>
@@ -205,140 +524,239 @@
                         </tr>
                     </tbody>
                 </table>
+
+                <div style="font-size: 9.5px; margin-top: 10px; color: #444;">
+                    <strong>IMPORTANT NOTICE ON VEHICLE AVAILABILITY & PRICING:</strong><br>
+                    1. <strong>Stock Availability:</strong> This quotation is based on active Japanese auction/supplier listing. Live inventory updates continuously and is subject to prior sale.<br>
+                    2. <strong>Price & Spec Guarantee:</strong> The quoted price applies specifically to this exact vehicle. If this unit is sold before deposit, alternative options will be presented.<br>
+                    3. <strong>Quote Validity:</strong> This quotation is valid for 48 Hours from issue date.
+                </div>
+
+                <div class="bank-box">
+                    <strong>ALL PAYMENTS TO BE MADE TO EITHER OF THE FOLLOWING ACCOUNTS:</strong>
+                    <div class="bank-grid">
+                        <div>
+                            <strong>Account Name:</strong> Niugini Open Biz<br>
+                            <strong>Account #:</strong> 7019659379<br>
+                            <strong>BANK:</strong> BSP | <strong>Branch:</strong> Waigani Drive<br>
+                            <strong>BSB Code:</strong> 088-968
+                        </div>
+                        <div>
+                            <strong>Account Name:</strong> Niugini Open Biz<br>
+                            <strong>Account #:</strong> 27720114<br>
+                            <strong>BANK:</strong> KINA | <strong>Branch:</strong> Jacksons 7 Mile<br>
+                            <strong>BSB Code:</strong> 028-022
+                        </div>
+                    </div>
+                </div>
             </div>
 
+            <!-- ACTION BUTTON GROUP -->
             <div class="action-btn-group">
                 <button class="btn-action btn-pdf" onclick="downloadOfficialPDF()">📥 Download Official Quote PDF</button>
-                <button class="btn-action btn-whatsapp" onclick="whatsappOfficialQuote()">💬 Send Quote via WhatsApp</button>
+                <button class="btn-action btn-whatsapp" onclick="whatsappOfficialQuote()">💬 Send Quote via WhatsApp (+675 78305513)</button>
             </div>
         </div>
+
     </div>
 </div>
 
 <script>
-    // ACTIVE FORMSPREE ENDPOINT
-    const FORMSPREE_ENDPOINT = "https://formspree.io/f/mwlealnb"; 
-
     let liveUsdToPgk = 4.57;
+    const txFeeBuffer = 1.03;
     let calculatedTotal = 0;
+    let currentQuoteSeq = 1;
+
+    async function fetchFxRate() {
+        try {
+            let response = await fetch('https://open.er-api.com/v6/latest/USD');
+            let data = await response.json();
+            if(data && data.rates && data.rates.PGK) {
+                liveUsdToPgk = data.rates.PGK * txFeeBuffer;
+                document.getElementById('rateStatus').innerText = `✅ Live Rate: $1 USD = K${liveUsdToPgk.toFixed(2)} PGK`;
+            }
+        } catch (e) {
+            document.getElementById('rateStatus').innerText = `✅ Live Rate: $1 USD = K${liveUsdToPgk.toFixed(2)} PGK`;
+        }
+    }
+    fetchFxRate();
 
     function calculateCost() {
+        const agentFeePGK = 1500;
+        const markupPGK = 10000;
+
         let cifUSD = parseFloat(document.getElementById('usdCif').value) || 0;
         let dutyRate = parseFloat(document.getElementById('dutyRate').value);
         let wharfagePGK = parseFloat(document.getElementById('portWharfage').value);
 
         let cifPGK = cifUSD * liveUsdToPgk;
         let dutyPGK = cifPGK * dutyRate;
-        calculatedTotal = cifPGK + dutyPGK + ((cifPGK + dutyPGK) * 0.10) + wharfagePGK + 11500;
-        
+        let gstPGK = (cifPGK + dutyPGK) * 0.10;
+
+        calculatedTotal = cifPGK + dutyPGK + gstPGK + wharfagePGK + agentFeePGK + markupPGK;
+        let deposit60 = calculatedTotal * 0.60;
+
         document.getElementById('totalPrice').innerText = 'K ' + Math.round(calculatedTotal).toLocaleString();
-        document.getElementById('depositPrice').innerText = '60% Pre-Order Deposit: K ' + Math.round(calculatedTotal * 0.60).toLocaleString();
+        document.getElementById('depositPrice').innerText = '60% Pre-Order Deposit: K ' + Math.round(deposit60).toLocaleString();
         document.getElementById('resultBox').style.display = 'block';
     }
 
-    function openQuoteModal() { document.getElementById('previewArea').style.display = 'none'; document.getElementById('quoteModal').style.display = 'flex'; }
-    function closeQuoteModal() { document.getElementById('quoteModal').style.display = 'none'; }
-    function showQuotePreview() { renderPDFData(); document.getElementById('previewArea').style.display = 'block'; }
+    function openQuoteModal() {
+        document.getElementById('previewArea').style.display = 'none';
+        document.getElementById('quoteModal').style.display = 'flex';
+    }
+
+    function closeQuoteModal() {
+        document.getElementById('quoteModal').style.display = 'none';
+    }
+
+    function showQuotePreview() {
+        renderPDFData();
+        document.getElementById('previewArea').style.display = 'block';
+    }
 
     function renderPDFData() {
-        let name = document.getElementById('custNameInput').value || 'James Paol';
-        let safeName = name.replace(/\s+/g, ''); 
-        
-        let today = new Date();
-        let dateStr = today.getDate() + today.toLocaleString('default', { month: 'short' }) + today.getFullYear().toString().substr(-2);
-        
-        document.getElementById('qInvNo').innerText = `NBZ26PO-${dateStr}-${safeName}`;
-        document.getElementById('qDate').innerText = `${today.getDate()}-${today.toLocaleString('default', { month: 'short' })}-${today.getFullYear().toString().substr(-2)}`;
-        
+        let name = document.getElementById('custNameInput').value || 'Joe Paul';
+        let phone = document.getElementById('custPhoneInput').value || '+67578305513';
+        let email = document.getElementById('custEmailInput').value || 'joepaul@gmail.com';
+        let loc = document.getElementById('custLocationInput').value || 'KAVIENG, NIP';
+        let veh = document.getElementById('vehModelInput').value || 'NISSAN X-TRAIL T31 SUV (Japanese Used Vehicle)';
+        let stock = document.getElementById('stockRefInput').value || 'CE139082';
+
+        let portSelect = document.getElementById('portWharfage');
+        let portName = portSelect.options[portSelect.selectedIndex].text;
+
+        let deposit = calculatedTotal * 0.60;
+        let balance = calculatedTotal * 0.40;
+
         document.getElementById('qCustName').innerText = name;
-        document.getElementById('qCustPhone').innerText = 'Ph. ' + (document.getElementById('custPhoneInput').value || '+67578305513');
-        document.getElementById('qCustEmail').innerText = 'Email: ' + (document.getElementById('custEmailInput').value || 'pao@gmail.com');
-        document.getElementById('qCustLocation').innerText = document.getElementById('custLocationInput').value || 'Kokopo';
-        document.getElementById('qVehName').innerText = document.getElementById('vehModelInput').value || 'Toyota Harrier';
-        document.getElementById('qCode').innerText = document.getElementById('stockRefInput').value || 'CC00328383';
+        document.getElementById('qCustPhone').innerText = 'Ph. ' + phone;
+        document.getElementById('qCustEmail').innerText = 'Email: ' + email;
+        document.getElementById('qCustLocation').innerText = loc;
+        document.getElementById('qVehName').innerText = veh;
+        document.getElementById('qCode').innerText = stock;
+        document.getElementById('qPort').innerText = portName;
+        document.getElementById('qPort2').innerText = portName;
 
         let formattedTotal = 'K ' + Math.round(calculatedTotal).toLocaleString() + '.00';
         document.getElementById('qUnitPrice').innerText = formattedTotal;
         document.getElementById('qLineAmount').innerText = formattedTotal;
         document.getElementById('qTotal').innerText = formattedTotal;
-        document.getElementById('qDeposit').innerText = 'K' + Math.round(calculatedTotal * 0.60).toLocaleString() + '.00';
-        document.getElementById('qBalance').innerText = 'K' + Math.round(calculatedTotal * 0.40).toLocaleString() + '.00';
+        document.getElementById('qDeposit').innerText = 'K' + Math.round(deposit).toLocaleString() + '.00';
+        document.getElementById('qBalance').innerText = 'K' + Math.round(balance).toLocaleString() + '.00';
+
+        let formattedSeq = String(currentQuoteSeq).padStart(3, '0');
+        let invNo = 'NBZ26PO' + formattedSeq;
+        document.getElementById('qInvNo').innerText = invNo;
+        
+        let today = new Date();
+        document.getElementById('qDate').innerText = today.getDate() + '-' + today.toLocaleString('default', { month: 'short' }) + '-' + today.getFullYear().toString().substr(-2);
+        
+        let validDate = new Date();
+        validDate.setDate(today.getDate() + 30);
+        document.getElementById('qValidDate').innerText = validDate.toLocaleString('default', { month: 'long' }) + ' ' + validDate.getDate() + ', ' + validDate.getFullYear();
     }
 
-    function sendEmailNotification(actionType) {
-        let invNo = document.getElementById('qInvNo').innerText;
+    function notifyAdminCopy(actionType) {
         let custName = document.getElementById('qCustName').innerText;
-        let custPhone = document.getElementById('qCustPhone').innerText;
-        let custEmail = document.getElementById('qCustEmail').innerText;
-        let custLoc = document.getElementById('qCustLocation').innerText;
+        let invNo = document.getElementById('qInvNo').innerText;
+        let vehName = document.getElementById('qVehName').innerText;
         let total = document.getElementById('qTotal').innerText;
         let deposit = document.getElementById('qDeposit').innerText;
-        let vehName = document.getElementById('qVehName').innerText;
+        let phone = document.getElementById('qCustPhone').innerText;
+        let location = document.getElementById('qCustLocation').innerText;
 
-        // SILENT WEBHOOK TO FORMSPREE (DELIVERS TO NIUGINIBIZ@GMAIL.COM)
-        fetch(FORMSPREE_ENDPOINT, {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({
-                subject: `New Quote Action (${actionType}): ${invNo}`,
-                actionType: actionType,
-                quoteNo: invNo,
-                customerName: custName,
-                customerPhone: custPhone,
-                customerEmail: custEmail,
-                location: custLoc,
-                vehicle: vehName,
-                totalDriveawayPrice: total,
-                depositRequired: deposit,
-                timestamp: new Date().toLocaleString()
-            })
-        }).catch(err => console.log('Background logging completed.'));
+        let logPayload = {
+            event: actionType,
+            invoice: invNo,
+            customer: custName,
+            phone: phone,
+            location: location,
+            vehicle: vehName,
+            totalPrice: total,
+            deposit60: deposit,
+            timestamp: new Date().toISOString()
+        };
+
+        // Webhook log copy (Optional Formspree / Google Sheets Endpoint)
+        try {
+            fetch('https://formspree.io/f/sales_quote_log', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(logPayload)
+            }).catch(e => console.log('Log sent via fallback.'));
+        } catch(e) {}
     }
 
     function downloadOfficialPDF() {
         const sourceElement = document.getElementById('pdfTemplate');
+        let custName = document.getElementById('qCustName').innerText.replace(/\s+/g, '_');
         let invNo = document.getElementById('qInvNo').innerText;
 
+        let pdfContainer = document.createElement('div');
+        pdfContainer.style.position = 'fixed';
+        pdfContainer.style.top = '0';
+        pdfContainer.style.left = '0';
+        pdfContainer.style.width = '750px';
+        pdfContainer.style.zIndex = '-9999';
+        pdfContainer.style.background = '#ffffff';
+
+        let clone = sourceElement.cloneNode(true);
+        pdfContainer.appendChild(clone);
+        document.body.appendChild(pdfContainer);
+
         let opt = {
-            margin: [0.3, 0.3, 0.3, 0.3],
-            filename: `Quote_${invNo}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            margin:       [0.3, 0.3, 0.3, 0.3],
+            filename:     `Proforma_Invoice_${invNo}_${custName}.pdf`,
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true, logging: false, scrollY: 0, scrollX: 0 },
+            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
         };
 
-        // Fire background copy to email
-        sendEmailNotification("PDF Download");
+        html2pdf().set(opt).from(clone).save().then(() => {
+            document.body.removeChild(pdfContainer);
+        });
 
-        // Save PDF to user device
-        html2pdf().set(opt).from(sourceElement).save();
+        notifyAdminCopy('PDF Download');
+        currentQuoteSeq++;
     }
 
     function whatsappOfficialQuote() {
-        let invNo = document.getElementById('qInvNo').innerText;
         let custName = document.getElementById('qCustName').innerText;
+        let invNo = document.getElementById('qInvNo').innerText;
+        let vehName = document.getElementById('qVehName').innerText;
         let total = document.getElementById('qTotal').innerText;
         let deposit = document.getElementById('qDeposit').innerText;
-        let vehName = document.getElementById('qVehName').innerText;
+        let balance = document.getElementById('qBalance').innerText;
+        let portName = document.getElementById('qPort').innerText;
+        let custPhone = document.getElementById('qCustPhone').innerText;
+        let custLoc = document.getElementById('qCustLocation').innerText;
 
         let message = `*NEW VEHICLE QUOTE GENERATED - ${invNo}*
 ----------------------------------------
 *Customer Name:* ${custName}
+*Phone:* ${custPhone}
+*Location:* ${custLoc}
+
 *Vehicle:* ${vehName}
+*Destination Port:* ${portName}
 *Total Driveaway Price:* ${total}
-*60% Pre-Order Deposit:* ${deposit}
+
+*PAYMENT STRUCTURE:*
+• 60% Pre-Order Deposit: ${deposit}
+• 40% Final Balance: ${balance}
 
 ----------------------------------------
 _Niugini Open Biz | Vehicle Sourcing Sales_`;
 
-        // Fire background copy to email
-        sendEmailNotification("WhatsApp Lead");
+        let adminWhatsApp = "67578305513";
+        let whatsappUrl = `https://wa.me/${adminWhatsApp}?text=${encodeURIComponent(message)}`;
 
-        window.open(`https://wa.me/67578305513?text=${encodeURIComponent(message)}`, '_blank');
+        notifyAdminCopy('WhatsApp Order');
+        window.open(whatsappUrl, '_blank');
+        currentQuoteSeq++;
     }
 </script>
+
 </body>
 </html>
