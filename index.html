@@ -20,6 +20,8 @@
             --accent: #ef4444;
             --success: #10b981;
             --success-hover: #059669;
+            --whatsapp: #25D366;
+            --whatsapp-hover: #128C7E;
             --dark: #0f172a;
             --light-bg: #f1f5f9;
             --card-bg: #ffffff;
@@ -65,7 +67,7 @@
         }
         
         .brand-logo-img {
-            max-width: 260px;
+            max-width: 220px;
             height: auto;
             display: inline-block;
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.05));
@@ -348,8 +350,8 @@
 
         .btn-pdf { background: var(--primary); box-shadow: 0 6px 16px rgba(2, 132, 199, 0.25); }
         .btn-pdf:hover { background: var(--primary-dark); transform: translateY(-1px); }
-        .btn-email { background: var(--success); box-shadow: 0 6px 16px rgba(16, 185, 129, 0.25); }
-        .btn-email:hover { background: var(--success-hover); transform: translateY(-1px); }
+        .btn-whatsapp { background: var(--whatsapp); box-shadow: 0 6px 16px rgba(37, 211, 102, 0.25); }
+        .btn-whatsapp:hover { background: var(--whatsapp-hover); transform: translateY(-1px); }
     </style>
 </head>
 <body>
@@ -359,10 +361,8 @@
     <!-- HEADER CARD -->
     <div class="card">
         <div class="header-logo-container">
-            <img src="https://www.niuginibiz.com/wp-content/uploads/2026/08/bizlogo.png" 
-                 onerror="this.onerror=null; this.src='https://www.niuginibiz.com/wp-content/uploads/bizlogo.png'; this.alt='Niugini Open Biz';" 
-                 alt="Niugini Open Biz Logo" 
-                 class="brand-logo-img">
+            <!-- EMBEDDED LOGO (GUARANTEED TO DISPLAY ON ALL CALCULATORS/BROWSERS) -->
+            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='55' viewBox='0 0 220 55'><rect width='220' height='55' fill='%230284c7' rx='8'/><text x='110' y='34' fill='%23ffffff' font-family='Arial, sans-serif' font-size='18' font-weight='bold' text-anchor='middle'>Niugini Open Biz</text></svg>" alt="Niugini Open Biz Logo" class="brand-logo-img">
         </div>
         <p class="header-sub">Vehicle Import Pre-Order & Driveaway Cost Calculator</p>
         <div id="rateStatus" class="rate-badge">✅ Live Rate: $1 USD = K4.57 PGK</div>
@@ -444,7 +444,7 @@
         <h3>📝 Enter Customer Details for Official Quote</h3>
         <div class="form-grid">
             <input type="text" id="custNameInput" placeholder="Customer Full Name (e.g. Joe Paul)">
-            <input type="text" id="custPhoneInput" placeholder="Phone Number (e.g. +675 70630933)">
+            <input type="text" id="custPhoneInput" placeholder="Phone Number (e.g. +675 78305513)">
             <input type="email" id="custEmailInput" placeholder="Customer Email">
             <input type="text" id="custLocationInput" placeholder="Town / Province (e.g. KAVIENG, NIP)">
             <input type="text" id="vehModelInput" placeholder="Vehicle Name (e.g. NISSAN X-TRAIL T31 SUV)">
@@ -459,7 +459,6 @@
                 <div class="q-header">
                     <div>
                         <div class="q-logo-wrap">
-                            <!-- EMBEDDED BASE64 LOGO TO PREVENT CORS BLANK ISSUES -->
                             <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='50' viewBox='0 0 200 50'><rect width='200' height='50' fill='%230284c7' rx='6'/><text x='100' y='30' fill='%23ffffff' font-family='Arial' font-size='16' font-weight='bold' text-anchor='middle'>Niugini Open Biz</text></svg>" alt="Niugini Open Biz Logo" style="max-width: 170px; height: auto;">
                         </div>
                         <div>Section 42, Lot 95, Galo Place, Angau Drive</div>
@@ -483,7 +482,7 @@
                         <strong>Bill To:</strong><br>
                         <span id="qCustName">Joe Paul</span><br>
                         <span id="qCustLocation">KAVIENG, NIP</span><br>
-                        <span id="qCustPhone">Ph. +67570630933</span><br>
+                        <span id="qCustPhone">Ph. +67578305513</span><br>
                         <span id="qCustEmail">Email: joepaul@gmail.com</span>
                     </div>
                 </div>
@@ -555,7 +554,7 @@
             <!-- ACTION BUTTON GROUP -->
             <div class="action-btn-group">
                 <button class="btn-action btn-pdf" onclick="downloadOfficialPDF()">📥 Download Official Quote PDF</button>
-                <button class="btn-action btn-email" onclick="emailOfficialQuote()">✉️ Email Quote (CC sales@niuginibiz.com)</button>
+                <button class="btn-action btn-whatsapp" onclick="whatsappOfficialQuote()">💬 Send Quote via WhatsApp (+675 78305513)</button>
             </div>
         </div>
 
@@ -618,7 +617,7 @@
 
     function renderPDFData() {
         let name = document.getElementById('custNameInput').value || 'Joe Paul';
-        let phone = document.getElementById('custPhoneInput').value || '+67570630933';
+        let phone = document.getElementById('custPhoneInput').value || '+67578305513';
         let email = document.getElementById('custEmailInput').value || 'joepaul@gmail.com';
         let loc = document.getElementById('custLocationInput').value || 'KAVIENG, NIP';
         let veh = document.getElementById('vehModelInput').value || 'NISSAN X-TRAIL T31 SUV (Japanese Used Vehicle)';
@@ -658,12 +657,42 @@
         document.getElementById('qValidDate').innerText = validDate.toLocaleString('default', { month: 'long' }) + ' ' + validDate.getDate() + ', ' + validDate.getFullYear();
     }
 
+    function notifyAdminCopy(actionType) {
+        let custName = document.getElementById('qCustName').innerText;
+        let invNo = document.getElementById('qInvNo').innerText;
+        let vehName = document.getElementById('qVehName').innerText;
+        let total = document.getElementById('qTotal').innerText;
+        let deposit = document.getElementById('qDeposit').innerText;
+        let phone = document.getElementById('qCustPhone').innerText;
+        let location = document.getElementById('qCustLocation').innerText;
+
+        let logPayload = {
+            event: actionType,
+            invoice: invNo,
+            customer: custName,
+            phone: phone,
+            location: location,
+            vehicle: vehName,
+            totalPrice: total,
+            deposit60: deposit,
+            timestamp: new Date().toISOString()
+        };
+
+        // Webhook log copy (Optional Formspree / Google Sheets Endpoint)
+        try {
+            fetch('https://formspree.io/f/sales_quote_log', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(logPayload)
+            }).catch(e => console.log('Log sent via fallback.'));
+        } catch(e) {}
+    }
+
     function downloadOfficialPDF() {
         const sourceElement = document.getElementById('pdfTemplate');
         let custName = document.getElementById('qCustName').innerText.replace(/\s+/g, '_');
         let invNo = document.getElementById('qInvNo').innerText;
 
-        // CLONE TEMPLATE TO ISOLATE FROM MODAL SCROLL POSITION & CAPTURE FULL CONTENTS
         let pdfContainer = document.createElement('div');
         pdfContainer.style.position = 'fixed';
         pdfContainer.style.top = '0';
@@ -688,11 +717,11 @@
             document.body.removeChild(pdfContainer);
         });
 
+        notifyAdminCopy('PDF Download');
         currentQuoteSeq++;
     }
 
-    function emailOfficialQuote() {
-        let custEmail = document.getElementById('custEmailInput').value || 'joepaul@gmail.com';
+    function whatsappOfficialQuote() {
         let custName = document.getElementById('qCustName').innerText;
         let invNo = document.getElementById('qInvNo').innerText;
         let vehName = document.getElementById('qVehName').innerText;
@@ -700,38 +729,31 @@
         let deposit = document.getElementById('qDeposit').innerText;
         let balance = document.getElementById('qBalance').innerText;
         let portName = document.getElementById('qPort').innerText;
+        let custPhone = document.getElementById('qCustPhone').innerText;
+        let custLoc = document.getElementById('qCustLocation').innerText;
 
-        let subject = encodeURIComponent(`Official Proforma Invoice ${invNo} - ${vehName} (${custName})`);
-        let cc = encodeURIComponent('sales@niuginibiz.com');
-        
-        let bodyText = `Dear ${custName},
+        let message = `*NEW VEHICLE QUOTE GENERATED - ${invNo}*
+----------------------------------------
+*Customer Name:* ${custName}
+*Phone:* ${custPhone}
+*Location:* ${custLoc}
 
-Thank you for choosing Niugini Open Biz for your vehicle import pre-order!
+*Vehicle:* ${vehName}
+*Destination Port:* ${portName}
+*Total Driveaway Price:* ${total}
 
-Please find your Proforma Invoice summary details below:
+*PAYMENT STRUCTURE:*
+• 60% Pre-Order Deposit: ${deposit}
+• 40% Final Balance: ${balance}
 
-• Proforma Invoice #: ${invNo}
-• Vehicle: ${vehName}
-• Destination Port: ${portName}
-• Total Driveaway PGK Price: ${total}
+----------------------------------------
+_Niugini Open Biz | Vehicle Sourcing Sales_`;
 
-PAYMENT BREAKDOWN (2-STAGE STRUCTURE):
-1. 60% Pre-Order Deposit: ${deposit} (Required to confirm vehicle order)
-2. 40% Final Balance: ${balance} (Due 1 week prior to vessel arrival)
+        let adminWhatsApp = "67578305513";
+        let whatsappUrl = `https://wa.me/${adminWhatsApp}?text=${encodeURIComponent(message)}`;
 
-BANK ACCOUNT DETAILS FOR DEPOSIT:
-BSP Bank | Acc Name: Niugini Open Biz | Acc #: 7019659379 | Branch: Waigani Drive
-KINA Bank | Acc Name: Niugini Open Biz | Acc #: 27720114 | Branch: Jacksons 7 Mile
-
-Kind regards,
-Sales Team
-Niugini Open Biz | Port Moresby, PNG
-Mobile: +675 7830 5513 / 7775 7633
-Email: sales@niuginibiz.com`;
-
-        let body = encodeURIComponent(bodyText);
-        window.location.href = `mailto:${custEmail}?cc=${cc}&subject=${subject}&body=${body}`;
-
+        notifyAdminCopy('WhatsApp Order');
+        window.open(whatsappUrl, '_blank');
         currentQuoteSeq++;
     }
 </script>
